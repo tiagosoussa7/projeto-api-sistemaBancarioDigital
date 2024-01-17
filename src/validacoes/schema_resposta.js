@@ -7,7 +7,9 @@ function data_resposta(data) {
   }
 
   function nome_resposta(nome) {
-    return nome.toLowerCase().replace(/(?:^|\s)\S/g, function(a) { return a.toUpperCase(); });
+  const partesDoNome = nome.toLowerCase().split(' ');
+  const nomeFormatado = partesDoNome.map(part => part.charAt(0).toUpperCase() + part.slice(1)).join(' ');
+  return nomeFormatado;
   }
 
   module.exports = {
