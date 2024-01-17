@@ -1,4 +1,5 @@
 const knex = require('../conexoes/knex');
+const bcrypt = require('bcrypt');
 
 const cadastro = async (req,res) => {
     const { nome, senha } = req.body;
@@ -9,6 +10,7 @@ const cadastro = async (req,res) => {
         const sistema_ocupado = await knex('dados_banco').select('nome').first();
 
         if (sistema_ocupado) {
+            
             if (sistema_ocupado.nome == nome) {
                 return res.status(400).json({mensagem: `O banco ${nome} já está cadastrado e usando o sistema.`});
             } else {
@@ -16,9 +18,11 @@ const cadastro = async (req,res) => {
             }
         }
         
+        const senhaCriptografada = await bcrypt.hash(senha, 10); 
+        
         await knex('dados_banco').insert({
             nome,
-            senha
+            senha: senhaCriptografada
         });
 
         return res.status(200).json({mensagem: `O cadastro do banco: ${nome} foi efetivado no sistema.`});
