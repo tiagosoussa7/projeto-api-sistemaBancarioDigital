@@ -35,18 +35,16 @@ const cadastro = async (req,res) => {
 
 const informacoes = async (req, res) => {
     const { nome, qtd_contas, orcamento, sistema_ativo } = req.banco;
-    const data = data_resposta(sistema_ativo);
-    const hora = hora_resposta(sistema_ativo);
 
     const banco_informacoes = {
-        Instituicão_cadastrada: nome,
+        Instituicão_cadastrada: nome_resposta(nome),
         Contas_ativas: qtd_contas,
         Orçamento_total: orcamento
     }
 
     const sistema = {
-        Data: data,
-        Hora: hora 
+        Data: data_resposta(sistema_ativo),
+        Hora: hora_resposta(sistema_ativo) 
     }
     
     return res.status(200).json({
