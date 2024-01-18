@@ -5,6 +5,4 @@ const rota_login_banco = express();
 
 rota_login_banco.post('/banco/login', login_banco);
 
-module.exports = {
-    rota_login_banco
-}
+module.exports = rota_login_banco;

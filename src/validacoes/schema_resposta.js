@@ -12,8 +12,19 @@ function data_resposta(data) {
   return nomeFormatado;
   }
 
+  function idade_resposta(dataNascimento) {
+    const partesData = dataNascimento.split('/');
+    const dataNascimentoObj = new Date(`${partesData[2]}-${partesData[1]}-${partesData[0]}`);
+    const dataAtual = new Date();
+    const diferencaEmMilissegundos = dataAtual - dataNascimentoObj;
+    const idade = Math.floor(diferencaEmMilissegundos / (365.25 * 24 * 60 * 60 * 1000));
+  
+    return idade;
+  }
+
   module.exports = {
     data_resposta,
     hora_resposta,
-    nome_resposta
+    nome_resposta,
+    idade_resposta
   }

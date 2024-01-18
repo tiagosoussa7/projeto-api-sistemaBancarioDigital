@@ -4,7 +4,6 @@ const { data_resposta, hora_resposta, nome_resposta } = require('../validacoes/s
 
 const cadastro = async (req,res) => {
     const { nome, senha } = req.body;
-    const nome_body = nome_resposta(nome);
     
     if (!nome || !senha) return res.status(400).json({mensagem: 'Os campos nome e senha são obrigatórios.'});
 
@@ -12,12 +11,11 @@ const cadastro = async (req,res) => {
         const sistema_ocupado = await knex('dados_banco').select('nome').first();
         
         if (sistema_ocupado) {
-            const nome_banco = nome_resposta(sistema_ocupado.nome);
             
             if (sistema_ocupado.nome == nome) {
-                return res.status(400).json({mensagem: `O banco ${nome_body} já está cadastrado e usando o sistema.`});
+                return res.status(400).json({mensagem: `O banco ${nome_resposta(nome)} já está cadastrado e usando o sistema.`});
             } else {
-                return res.status(400).json({mensagem: `O cadastro do banco: ${nome_body} foi bloqueado, o sistema está em uso pelo banco ${nome_banco}.`});
+                return res.status(400).json({mensagem: `O cadastro do banco: ${nome_resposta(nome)} foi bloqueado, o sistema está em uso pelo banco ${nome_resposta(sistema_ocupado.nome)}.`});
             }
         }
         
@@ -28,7 +26,7 @@ const cadastro = async (req,res) => {
             senha: senhaCriptografada
         });
 
-        return res.status(200).json({mensagem: `O cadastro do banco: ${nome_body} foi efetivado no sistema.`});
+        return res.status(200).json({mensagem: `O cadastro do banco: ${nome_resposta(nome)} foi efetivado no sistema.`});
     
     } catch (error) {
         return res.status(500).json({mensagem: `${error.message}`});
@@ -61,13 +59,13 @@ const informacoes = async (req, res) => {
 const atualizar = async (req, res) => {
     const { nome, senha } = req.body;
     const { id_banco } = req.banco;
-
+    
     if (nome) { 
-        const nome_body = nome_resposta(nome);
-        if (req.banco.nome === nome) return res.status(401).json({mensagem: `Atualização negada: o nome ${nome_body} é o mesmo do banco cadastrado no sistema.`});
+        if (req.banco.nome === nome) return res.status(401).json({mensagem: `Atualização negada: o nome ${nome_resposta(nome)} é o mesmo do banco cadastrado no sistema.`});
     }
     
     try {
+    
         if (senha) { 
             const senha_atualizada = await bcrypt.compare(senha, req.banco.senha);
             
@@ -76,30 +74,35 @@ const atualizar = async (req, res) => {
 
         const senhaCriptografada = await bcrypt.hash(senha, 10);
         
-        await knex('dados_banco')
-        .where({ id_banco})
+        const [ banco ] = await knex('dados_banco')
+        .where({ id_banco })
         .update({
             nome, 
             senha: senhaCriptografada
-        });
+        }).returning('*')
+        console.log(banco.nome);
+        if (banco.nome === nome) {
+            return res.status(200).json({mensagem: 'Atualização efetivada: o nome do banco foi modificado.'});
+        }
         
-        return res.status(200).json({mensagem: 'Atualização efetivada.'});
+        if (banco.senha !== req.senha) {
+            return res.status(200).json({mensagem: 'Atualização efetivada: a senha foi modificada.'});
+        }
+        
+        return res.status(200).json({mensagem: 'Atualização efetivada: nome e senha modificados.'});
+
+        
 
     } catch (error) {
         return res.status(500).json({mensagem: `${error.message}`});
     }
 }
 
-        
-        
-
-
-
 //res.status(200).json({mensagem: 'ok'})
 module.exports = {
-cadastro,
-informacoes,
-atualizar
+    cadastro,
+    informacoes,
+    atualizar
 }
 
 
