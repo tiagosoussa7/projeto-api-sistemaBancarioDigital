@@ -37,7 +37,7 @@ const informacoes = async (req, res) => {
     const { nome, qtd_contas, orcamento, sistema_ativo } = req.banco;
 
     const banco_informacoes = {
-        Instituicão_cadastrada: nome_resposta(nome),
+        Banco_cadastrada: nome_resposta(nome),
         Contas_ativas: qtd_contas,
         Orçamento_total: orcamento
     }
@@ -96,11 +96,48 @@ const atualizar = async (req, res) => {
     }
 }
 
+const excluir = async (req, res) => {
+    const { nome, senha } = req.body;
+    const { id_banco } = req.banco;
+    
+    if (!nome || !senha) {
+        return res.status(400).json({mensagem: 'Exclusão bloqueada: os campos nome e senha são obrigatórios.'}); 
+    }
+    
+    if (req.banco.nome !== nome) {
+        return res.status(400).json({mensagem: `Exclusão bloqueada: o banco ${nome_resposta(nome)} não é o controlador atual do sistema.`}); 
+    }
+
+    try {
+        const senha_correta = await bcrypt.compare(senha, req.banco.senha);
+
+        if (!senha_correta) return res.status(400).json({mensagem: 'Senha inválida.'});
+
+        await knex.transaction(async (trx) => {
+            
+            await trx('dados_conta').where({ id_banco}).del();
+            await trx('dados_cliente').where({ id_banco}).del();
+            //await trx('transacoes').where({}).del();
+      
+            await trx('dados_banco').where({ id_banco }).del();
+      
+        });    
+        
+        return res.json({mensagem: `Exclusão efetivada: o banco ${nome_resposta(nome)} não é mais o controlador do sistema.`});
+        
+    } catch (error) {
+        return res.status(500).json(`${error.message}`)
+    }
+}
+        
+
+
 //res.status(200).json({mensagem: 'ok'})
 module.exports = {
     cadastro,
     informacoes,
-    atualizar
+    atualizar,
+    excluir
 }
 
 
