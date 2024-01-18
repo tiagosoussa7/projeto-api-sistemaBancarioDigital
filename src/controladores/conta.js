@@ -9,27 +9,27 @@ const cadastro = async (req,res) => {
         const banco_cadastrado = await knex('dados_banco').select('*').first();
     
         if (!banco_cadastrado) {
-            res.status(400).json({mensagem: `Cadastro bloqueado: ${nome_resposta(nome)} o sistema está sem banco controlador.`});
+            res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} o sistema está sem banco controlador.`});
         }
 
         if (!nome || !cpf || !email || !data_nascimento || !senha) { 
-            return res.status(400).json({mensagem: `Cadastro bloqueado: ${nome_resposta(nome)}, todos os campos são obrigatórios.`});
+            return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)}, todos os campos são obrigatórios.`});
         }
 
         if (idade_resposta(data_nascimento) < 18) {
-            return res.status(400).json({mensagem: `${nome_resposta(nome)} é necessário ter 18 anos para abrir uma conta no banco: ${nome_resposta(banco_cadastrado.nome)}.`});
+            return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} é necessário ter 18 anos para abrir uma conta no banco: ${nome_resposta(banco_cadastrado.nome)}.`});
         }
 
         const email_cadastrado = await knex('dados_cliente').where({email}).first();
         
         if (email_cadastrado) {
-            return res.status(400).json({mensagem: `Cadastro bloqueado: ${nome_resposta(nome)} o email: ${email} já tem cadastro no banco.`});
+            return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} o email: ${email} já tem cadastro no banco.`});
         }
 
         const cpf_cadastrado = await knex('dados_cliente').where({cpf}).first();
         
         if (cpf_cadastrado) {
-            return res.status(400).json({mensagem: `Cadastro bloqueado: ${nome_resposta(nome)} o cpf: ${cpf} já tem cadastro no banco.`});
+            return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} o cpf: ${cpf} já tem cadastro no banco.`});
         }
         
         const senhaCriptografada = await bcrypt.hash(senha, 10); 

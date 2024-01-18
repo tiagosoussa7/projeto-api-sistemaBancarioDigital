@@ -1,6 +1,6 @@
 const knex = require('../conexoes/knex');
 const bcrypt = require('bcrypt');
-const { data_resposta, hora_resposta, nome_resposta } = require('../validacoes/schema_resposta');
+const { data_resposta, hora_resposta, nome_resposta, idade_resposta } = require('../validacoes/schema_resposta');
 
 const cadastro = async (req,res) => {
     const { nome, senha } = req.body;
@@ -51,6 +51,67 @@ const informacoes = async (req, res) => {
         Informações_banco: banco_informacoes,
         Sistema_ativado: sistema
     });
+}
+
+const consulta_conta = async (req, res) => {
+    const { numero_conta } = req.body;
+    
+    try {
+        if (numero_conta) {
+            const conta_cadastrada = await knex('dados_conta').where({numero_conta: parseInt(numero_conta)}).first();
+            if (conta_cadastrada) {
+                const conta = await knex.select(
+                    'dados_conta.numero_conta',
+                    'dados_conta.saldo',
+                    'dados_conta.total_saques',
+                    'dados_conta.total_depositos',
+                    'dados_conta.qtd_transferencias',
+                    'dados_conta.abertura_conta',
+                    'dados_cliente.nome'
+                )
+                .from('dados_conta')
+                .join('dados_cliente', 'dados_conta.numero_conta', 'dados_cliente.id_cliente')
+                .where({numero_conta}).first();
+ 
+                const dados_conta = {
+                    Numero_conta: conta.numero_conta,
+                    Nome: nome_resposta(conta.nome),
+                    Saldo: conta.saldo,
+                    Total_saques: conta.total_saques,
+                    Total_depositos: conta.total_depositos,
+                    Numero_transferências: conta.qtd_transferencias,
+                    Conta_aberta: data_resposta(conta.abertura_conta),
+                    Horário: hora_resposta(conta.abertura_conta)
+                }
+                
+                return res.status(200).json({Dados_conta: dados_conta})
+            } else {
+                return res.status(200).json({mensagem: `A conta de número:${numero_conta} não existe no banco ${nome_resposta(req.banco.nome)}.`})
+            }
+            
+        }
+        
+        const contas = await knex.select(
+            'dados_conta.numero_conta',
+            'dados_cliente.nome',
+            'dados_conta.saldo',
+            'dados_conta.total_saques',
+            'dados_conta.total_depositos',
+            'dados_conta.qtd_transferencias'
+        )
+        .from('dados_conta')
+        .join('dados_cliente', 'dados_conta.numero_conta', 'dados_cliente.id_cliente')
+        .orderBy('dados_conta.numero_conta', 'asc');
+        
+        
+
+        
+        return res.status(200).json({Dados_contas: contas});
+
+    } catch (error) {
+        return res.status(500).json('erro')
+        
+    }
 }
     
 
@@ -137,7 +198,8 @@ module.exports = {
     cadastro,
     informacoes,
     atualizar,
-    excluir
+    excluir,
+    consulta_conta
 }
 
 
