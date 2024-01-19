@@ -6,9 +6,9 @@ const cadastro = async (req,res) => {
     const { nome, cpf, email, data_nascimento, senha } = req.body;
     
     try {                
-        const banco_cadastrado = await knex('dados_banco').select('*').first();
-    
-        if (!banco_cadastrado) {
+        const banco_cadastrado = await knex('dados_banco').select('nome').first();
+        
+        if (!banco_cadastrado.nome) {
             res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} o sistema está sem banco controlador.`});
         }
 
@@ -17,19 +17,19 @@ const cadastro = async (req,res) => {
         }
 
         if (idade_resposta(data_nascimento) < 18) {
-            return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} é necessário ter 18 anos para abrir uma conta no banco: ${nome_resposta(banco_cadastrado.nome)}.`});
+            return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} é necessário ter 18 anos para abrir uma conta no banco ${nome_resposta(banco_cadastrado.nome)}.`});
         }
 
         const email_cadastrado = await knex('dados_cliente').where({email}).first();
         
         if (email_cadastrado) {
-            return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} o email: ${email} já tem cadastro no banco.`});
+            return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} o email: ${email} já tem cadastro no banco ${nome_resposta(banco_cadastrado.nome)}.`});
         }
 
         const cpf_cadastrado = await knex('dados_cliente').where({cpf}).first();
         
         if (cpf_cadastrado) {
-            return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} o cpf: ${cpf} já tem cadastro no banco.`});
+            return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} o cpf: ${cpf} já tem cadastro no banco ${banco_cadastrado.nome}.`});
         }
         
         const senhaCriptografada = await bcrypt.hash(senha, 10); 
