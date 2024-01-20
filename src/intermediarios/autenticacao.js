@@ -15,7 +15,7 @@ const banco_autenticacao = async (req, res, next) => {
         
         const banco_cadastrado = await knex('dados_banco').where({ senha }).first();
         
-        if (!banco_cadastrado) return res.status(401).json({mensagem: 'Não autorizado: sistema offline, é necessário cadastrar um banco.'});
+        if (!banco_cadastrado) return res.status(401).json({mensagem: 'Não autorizado: o sistema bancario digital está offline.'});
 
         req.banco = banco_cadastrado;
      
