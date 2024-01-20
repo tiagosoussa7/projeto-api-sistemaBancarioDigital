@@ -26,7 +26,7 @@ const cadastro = async (req,res) => {
             const senha_criptografada = await bcrypt.hash(senha, 10); 
         
             await knex('dados_banco').insert({
-                nome,
+                nome: instituicao_nome,
                 senha: senha_criptografada
             });
 
@@ -110,12 +110,10 @@ const consulta_conta = async (req, res) => {
         return res.status(200).json({Dados_contas: contas});
 
     } catch (error) {
-        return res.status(500).json('erro')
-        
+        return res.status(400).json('Consulta negada: ')
     }
 }
     
-
 const atualizar = async (req, res) => {
     const { nome, senha } = req.body;
     const { id_banco } = req.banco;
