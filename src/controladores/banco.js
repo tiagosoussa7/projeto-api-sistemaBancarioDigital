@@ -3,30 +3,37 @@ const bcrypt = require('bcrypt');
 const { data_resposta, hora_resposta, nome_resposta, idade_resposta } = require('../validacoes/schema_resposta');
 
 const cadastro = async (req,res) => {
-    const { nome, senha } = req.body;
+    const { instituicao_nome, senha } = req.body;
     
-    if (!nome || !senha) return res.status(400).json({mensagem: 'Os campos nome e senha são obrigatórios.'});
-
+    if (instituicao_nome && !senha) return res.status(400).json({mensagem: `Cadastro negado: o campo senha é obrigátorio.`});
+    if (senha && !instituicao_nome) return res.status(400).json({mensagem: `Cadastro negado: o campo Instituição é obrigátorio.`});
+    
     try {
-        const sistema_ocupado = await knex('dados_banco').select('nome').first();
         
-        if (sistema_ocupado) {
-            
-            if (sistema_ocupado.nome == nome) {
-                return res.status(400).json({mensagem: `O banco ${nome_resposta(nome)} já está cadastrado e usando o sistema.`});
-            } else {
-                return res.status(400).json({mensagem: `O cadastro do banco: ${nome_resposta(nome)} foi bloqueado, o sistema está em uso pelo banco ${nome_resposta(sistema_ocupado.nome)}.`});
-            }
-        }
-        
-        const senhaCriptografada = await bcrypt.hash(senha, 10); 
-        
-        await knex('dados_banco').insert({
-            nome,
-            senha: senhaCriptografada
-        });
+        if ( instituicao_nome && senha) {
 
-        return res.status(200).json({mensagem: `O cadastro do banco: ${nome_resposta(nome)} foi efetivado no sistema.`});
+            const sistema_ocupado = await knex('dados_banco').select('nome').first();
+        
+            if (sistema_ocupado) {
+            
+                if (sistema_ocupado.nome == instituicao_nome) {
+                    return res.status(400).json({mensagem: `Cadastro negado: a instituição ${nome_resposta(instituicao_nome)} já é a atual controladora do sistema bancário digital.`});
+                } else {
+                    return res.status(400).json({mensagem: `Cadastro negado: a instituição ${nome_resposta(sistema_ocupado.nome)} é a atual controladora do sistema bancário digital.`});
+                }
+            }
+        
+            const senha_criptografada = await bcrypt.hash(senha, 10); 
+        
+            await knex('dados_banco').insert({
+                nome,
+                senha: senha_criptografada
+            });
+
+            return res.status(200).json({mensagem: `Cadastro efetivado: a instituição ${nome_resposta(instituicao_nome)} agora é controladora do sistema bancário digital.`});
+        }
+
+        return res.status(400).json({mensagem: 'Cadastro negado: os campos instituição e senha são obrigatórios.'});
     
     } catch (error) {
         return res.status(500).json({mensagem: `${error.message}`});
