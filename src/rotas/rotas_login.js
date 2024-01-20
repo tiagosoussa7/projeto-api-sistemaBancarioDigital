@@ -1,8 +1,9 @@
 const express = require('express');
-const { login_banco } = require('../controladores/login');
+const { login_geral } = require('../controladores/login')
 
-const rota_login_banco = express();
+const rota_login = express();
 
-rota_login_banco.post('/banco/login', login_banco);
+rota_login.post('/banco/login', login_geral);
+rota_login.post('/conta/login', login_geral);
 
-module.exports = rota_login_banco;
+module.exports = rota_login;
