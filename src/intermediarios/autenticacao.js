@@ -11,11 +11,11 @@ const banco_autenticacao = async (req, res, next) => {
 
         if (!token) return res.status(400).json({mensagem: 'Não autorizado'});
         
-        const { nome } = jwt.verify(token, 'senha_segura_token');
+        const { senha } = jwt.verify(token, 'senha_segura_token');
         
-        const banco_cadastrado = await knex('dados_banco').where({ nome }).first();
+        const banco_cadastrado = await knex('dados_banco').where({ senha }).first();
         
-        if (!banco_cadastrado) return res.status(401).json({mensagem: 'Sem autorização de acesso.'});
+        if (!banco_cadastrado) return res.status(401).json({mensagem: 'Não autorizado: sistema offline, é necessário cadastrar um banco.'});
 
         req.banco = banco_cadastrado;
      
