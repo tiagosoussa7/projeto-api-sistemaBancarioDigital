@@ -5,7 +5,8 @@ create table dados_banco (
   nome text not null,
   qtd_contas int default 0,
   orcamento decimal(10, 2) default 0,
-  sistema_ativado timestamp default current_timestamp,
+  data_ativacao date default current_date,
+  hora_ativacao time default current_time,
   senha varchar(255) not null
  );
   
@@ -25,6 +26,7 @@ create table dados_conta (
   total_saques decimal(10, 2) default 0,
   total_depositos decimal(10, 2) default 0,
   qtd_transferencias int default 0,
-  abertura_conta timestamp default current_timestamp,
+  data_abertura date default current_date,
+  hora_abertura time default current_time,
   id_banco int references dados_banco(id_banco) on delete cascade
  );
