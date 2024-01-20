@@ -41,14 +41,13 @@ const cadastro = async (req,res) => {
 }
 
 const informacoes = async (req, res) => {
-    const { nome, qtd_contas, orcamento, data_ativacao, hora_ativacao } = req.banco;
 
     const banco_informacoes = {
-        Banco_cadastrada: nome_resposta(nome),
-        Contas_ativas: qtd_contas,
-        Orçamento_total: orcamento,
-        Sistema_ativado: data_resposta(data_ativacao),
-        //Horario: hora_resposta(hora_ativacao)
+        Banco_cadastrada: nome_resposta(req.banco.nome),
+        Contas_ativas: req.banco.qtd_contas,
+        Orçamento_total: req.banco.orcamento,
+        Sistema_ativado: data_resposta(req.banco.data_ativacao),
+        Horario: hora_resposta(req.banco.hora_ativacao)
     }
     
     return res.status(200).json({Informações_banco: banco_informacoes});
@@ -59,7 +58,9 @@ const consulta_conta = async (req, res) => {
     
     try {
         if (numero_conta) {
+            
             const conta_cadastrada = await knex('dados_conta').where({numero_conta: parseInt(numero_conta)}).first();
+            
             if (conta_cadastrada) {
                 const conta = await knex.select(
                     'dados_conta.numero_conta',
@@ -67,7 +68,8 @@ const consulta_conta = async (req, res) => {
                     'dados_conta.total_saques',
                     'dados_conta.total_depositos',
                     'dados_conta.qtd_transferencias',
-                    'dados_conta.abertura_conta',
+                    'dados_conta.data_abertura',
+                    'dados_conta.hora_abertura',
                     'dados_cliente.nome'
                 )
                 .from('dados_conta')
@@ -81,13 +83,13 @@ const consulta_conta = async (req, res) => {
                     Total_saques: conta.total_saques,
                     Total_depositos: conta.total_depositos,
                     Numero_transferências: conta.qtd_transferencias,
-                    Conta_aberta: data_resposta(conta.abertura_conta),
-                    Horário: hora_resposta(conta.abertura_conta)
+                    Conta_aberta: data_resposta(conta.data_abertura),
+                    Horário: hora_resposta(conta.hora_abertura)
                 }
                 
                 return res.status(200).json({Dados_conta: dados_conta})
             } else {
-                return res.status(200).json({mensagem: `A conta de número:${numero_conta} não existe no banco ${nome_resposta(req.banco.nome)}.`})
+                return res.status(200).json({mensagem: `A conta de número: ${numero_conta} não existe no banco: ${nome_resposta(req.banco.nome)}.`})
             }
             
         }
@@ -98,15 +100,14 @@ const consulta_conta = async (req, res) => {
             'dados_conta.saldo',
             'dados_conta.total_saques',
             'dados_conta.total_depositos',
-            'dados_conta.qtd_transferencias'
+            'dados_conta.qtd_transferencias',
+            'dados_conta.data_abertura',
+            'dados_conta.hora_abertura'
         )
         .from('dados_conta')
         .join('dados_cliente', 'dados_conta.numero_conta', 'dados_cliente.id_cliente')
         .orderBy('dados_conta.numero_conta', 'asc');
-        
-        
-
-        
+                
         return res.status(200).json({Dados_contas: contas});
 
     } catch (error) {
