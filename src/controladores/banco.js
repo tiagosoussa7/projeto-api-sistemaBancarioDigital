@@ -100,9 +100,7 @@ const consulta_conta = async (req, res) => {
             'dados_conta.saldo',
             'dados_conta.total_saques',
             'dados_conta.total_depositos',
-            'dados_conta.qtd_transferencias',
-            'dados_conta.data_abertura',
-            'dados_conta.hora_abertura'
+            'dados_conta.qtd_transferencias'
         )
         .from('dados_conta')
         .join('dados_cliente', 'dados_conta.numero_conta', 'dados_cliente.id_cliente')
@@ -111,7 +109,7 @@ const consulta_conta = async (req, res) => {
         return res.status(200).json({Dados_contas: contas});
 
     } catch (error) {
-        return res.status(400).json('Consulta negada: ')
+        return res.status(500).json({mensagem: `${error.message}`});
     }
 }
     
