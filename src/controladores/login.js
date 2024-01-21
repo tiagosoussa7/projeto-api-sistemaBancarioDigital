@@ -17,7 +17,7 @@ const login = async (req, res) => {
             return gerar_token(banco_cadastrado, senha, res);
         }
         
-        if (cpf && senha || email && senha) {
+        if ((cpf || email) && senha) {
             
             if (cpf) {
                 

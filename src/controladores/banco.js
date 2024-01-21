@@ -5,8 +5,9 @@ const { data_resposta, hora_resposta, nome_resposta, idade_resposta } = require(
 const cadastro = async (req,res) => {
     const { instituicao_nome, senha } = req.body;
     
-    if (instituicao_nome && !senha) return res.status(400).json({mensagem: `Cadastro negado: o campo senha é obrigátorio.`});
-    if (senha && !instituicao_nome) return res.status(400).json({mensagem: `Cadastro negado: o campo Instituição é obrigátorio.`});
+    if ((instituicao_nome && !senha) || (senha && !instituicao_nome)) {
+        return res.status(400).json({mensagem: `Cadastro negado: o campo ${instituicao_nome ? 'senha' : 'nome da Instituição'} é obrigátorio.`});
+    }
     
     try {
         
@@ -112,6 +113,10 @@ const consulta_conta = async (req, res) => {
         return res.status(500).json({mensagem: `${error.message}`});
     }
 }
+
+const consulta_cliente = async (req, res) => {
+
+}
     
 const atualizar = async (req, res) => {
     const { nome, senha } = req.body;
@@ -195,9 +200,10 @@ const excluir = async (req, res) => {
 module.exports = {
     cadastro,
     informacoes,
+    consulta_conta,
+    consulta_cliente,
     atualizar,
-    excluir,
-    consulta_conta
+    excluir
 }
 
 
