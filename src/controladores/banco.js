@@ -2,6 +2,7 @@ const knex = require('../conexoes/knex');
 const bcrypt = require('bcrypt');
 const { data_resposta, hora_resposta, nome_resposta, idade_resposta } = require('../validacoes/schema_resposta');
 const { conta_consultada, contas_consultadas } = require('../validacoes/schema_banco/schema_consultaConta.js');
+const { cliente_consultado, clientes_consultados } = require('../validacoes/schema_banco/schema_consultaCliente.js');
 
 const cadastro = async (req,res) => {
     const { instituicao_nome, senha } = req.body;
@@ -64,14 +65,25 @@ const consulta_conta = async (req, res) => {
         }
         
         return contas_consultadas(res);
-        
+
     } catch (error) {
         return res.status(500).json({mensagem: `${error.message}`});
     }
 }
 
 const consulta_cliente = async (req, res) => {
+    const { cpf } = req.body;
 
+    try {
+        if (cpf) {
+            return cliente_consultado(cpf, res);
+        }
+
+        return clientes_consultados(res);
+
+    } catch (error) {
+        return res.status(500).json({mensagem: `${error.message}`});
+    }
 }
     
 const atualizar = async (req, res) => {
