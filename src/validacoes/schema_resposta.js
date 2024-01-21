@@ -2,12 +2,13 @@ function data_resposta(data) {
     return new Intl.DateTimeFormat('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }).format(data);
   }
   
-  function hora_resposta(horaBanco) {
-    horaBanco = horaBanco.toString();
+  function hora_resposta(dado) {
+    const partes = dado.split(':');
 
-    const horaObjeto = new Date(`2000-01-01T${horaBanco}Z`);
-    const opcoes = { timeZone: 'America/Sao_Paulo', hour: '2-digit', minute: '2-digit' };
-    return horaObjeto.toLocaleTimeString([], opcoes);
+    const hora = partes[0];
+    const minutos = partes[1];
+
+    return `${hora}:${minutos}`;
   }
 
   function nome_resposta(nome) {
