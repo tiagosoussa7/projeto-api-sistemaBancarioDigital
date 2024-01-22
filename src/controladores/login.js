@@ -3,10 +3,10 @@ const { gerar_token } = require("../validacoes/schema_login");
 const { nome_resposta } = require('../validacoes/schema_resposta');
 
 const login = async (req, res) => {
-    const { instituicao_nome, cpf, email, senha } = req.body;
+    const { instituicao_nome, instituicao_senha, cpf, email, senha } = req.body;
 
     try {
-        if (instituicao_nome && senha) {
+        if (instituicao_nome && instituicao_senha) {
             
             const banco_cadastrado = await knex('dados_banco').select('nome', 'senha').first();
             
@@ -14,7 +14,7 @@ const login = async (req, res) => {
 
             if (banco_cadastrado.nome !== instituicao_nome) return res.status(400).json({mensagem: `Login negado: o nome ${nome_resposta(instituicao_nome)} não corresponde ao do banco cadastrado no sistema.`});
             
-            return gerar_token(banco_cadastrado, senha, res);
+            return gerar_token(banco_cadastrado, instituicao_senha, res);
         }
         
         if ((cpf || email) && senha) {

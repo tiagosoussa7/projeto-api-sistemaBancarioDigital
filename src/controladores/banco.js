@@ -3,17 +3,18 @@ const bcrypt = require('bcrypt');
 const { data_resposta, hora_resposta, nome_resposta, idade_resposta } = require('../validacoes/schema_resposta');
 const { conta_consultada, contas_consultadas } = require('../validacoes/schema_banco/schema_consultaConta.js');
 const { cliente_consultado, clientes_consultados } = require('../validacoes/schema_banco/schema_consultaCliente.js');
+const { checar_nomeBanco, checar_senha, encriptar_senha } = require('../validacoes/schema_banco/schema_atualizar.js');
 
 const cadastro = async (req,res) => {
-    const { instituicao_nome, senha } = req.body;
+    const { instituicao_nome, instituicao_senha } = req.body;
     
-    if ((instituicao_nome && !senha) || (senha && !instituicao_nome)) {
+    if ((instituicao_nome && !instituicao_senha) || (instituicao_senha && !instituicao_nome)) {
         return res.status(400).json({mensagem: `Cadastro negado: o campo ${instituicao_nome ? 'senha' : 'nome da Instituição'} é obrigátorio.`});
     }
 
     try {
         
-        if ( instituicao_nome && senha) {
+        if ( instituicao_nome && instituicao_senha) {
 
             const sistema_ocupado = await knex('dados_banco').select('nome').first();
         
@@ -26,7 +27,7 @@ const cadastro = async (req,res) => {
                 }
             }
         
-            const senha_criptografada = await bcrypt.hash(senha, 10); 
+            const senha_criptografada = await bcrypt.hash(instituicao_senha, 10); 
         
             await knex('dados_banco').insert({
                 nome: instituicao_nome,
@@ -85,46 +86,55 @@ const consulta_cliente = async (req, res) => {
         return res.status(500).json({mensagem: `${error.message}`});
     }
 }
-    
 const atualizar = async (req, res) => {
-    const { nome, senha } = req.body;
-    const { id_banco } = req.banco;
+    const { instituicao_nome, instituicao_senha } = req.body;
+    const { id_banco, nome, senha } = req.banco;
     
-    if (nome) { 
-        if (req.banco.nome === nome) return res.status(401).json({mensagem: `Atualização negada: o nome ${nome_resposta(nome)} é o mesmo do banco cadastrado no sistema.`});
-    }
-    
+
     try {
-    
-        if (senha) { 
-            const senha_atualizada = await bcrypt.compare(senha, req.banco.senha);
+        if ((instituicao_nome && instituicao_senha) || instituicao_nome || instituicao_senha) {
             
-            if (senha_atualizada) return res.status(401).json({mensagem: `Atualização negada: a senha da atualização é a mesma do banco cadastrado no sistema.`});
-        }
+            if (instituicao_nome && instituicao_senha) {
+                
+                if (instituicao_nome === nome) return res.status(400).json({mensagem: `Atualização negada: o nome ${nome_resposta(instituicao_nome) } é o mesmo do banco controlador do sistema.`});
 
-        const senhaCriptografada = await bcrypt.hash(senha, 10);
-        
-        const [ banco ] = await knex('dados_banco')
-        .where({ id_banco })
-        .update({
-            nome, 
-            senha: senhaCriptografada
-        }).returning('*')
-        console.log(banco.nome);
-        if (banco.nome === nome) {
-            return res.status(200).json({mensagem: 'Atualização efetivada: o nome do banco foi modificado.'});
-        }
-        
-        if (banco.senha !== req.senha) {
-            return res.status(200).json({mensagem: 'Atualização efetivada: a senha foi modificada.'});
-        }
-        
-        return res.status(200).json({mensagem: 'Atualização efetivada: nome e senha modificados.'});
+                const comparar_senha = await bcrypt.compare(instituicao_senha, senha);
+                
+                if (comparar_senha) return res.status(401).json({mensagem: `Atualização negada: a senha da atualização é a mesma do banco cadastrado no sistema.`});
+            
+                const senha_criptografada = await bcrypt.hash(instituicao_senha, 10);
+                
+                await knex('dados_banco').where({ id_banco }).update({nome: instituicao_nome, senha: senha_criptografada });
+                
+                return res.status(400).json({mensagem: `Atualização efetivada: o nome e a senha da instituição foram modificados.`});
+            }
 
-        
+            if (instituicao_nome) {
+                if (instituicao_nome === nome) return res.status(400).json({mensagem: `Atualização negada: o nome ${nome_resposta(instituicao_nome) } é o mesmo do banco controlador do sistema.`});
 
+                await knex('dados_banco').where({ id_banco }).update({nome: instituicao_nome});
+                
+                return res.status(400).json({mensagem: `Atualização efetivada: o banco: ${nome_resposta(req.banco.nome)} agora se chama ${nome_resposta(instituicao_nome)}.`});
+            }
+            
+            if (instituicao_senha) { 
+                
+                const comparar_senha = await bcrypt.compare(instituicao_senha, senha);
+                
+                if (comparar_senha) return res.status(401).json({mensagem: `Atualização negada: a senha da atualização é a mesma do banco cadastrado no sistema.`});
+            
+                const senha_criptografada = await bcrypt.hash(instituicao_senha, 10);
+                
+                await knex('dados_banco').where({ id_banco }).update({senha: senha_criptografada });
+                
+                return res.status(400).json({mensagem: `Atualização efetivada: a senha da instituição foi modificados.`});
+            }
+        }
+            
+        return res.status(400).json({mensagem: 'Atualização negada: para modificação de dados é necessário preencher ao menos um campo'});
+        
     } catch (error) {
-        return res.status(500).json({mensagem: `${error.message}`});
+        return res.status(500).json(`${error.message}`)
     }
 }
 
