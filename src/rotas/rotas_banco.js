@@ -1,6 +1,7 @@
 const express = require('express');
-const { cadastro, atualizar, informacoes, excluir, consulta_conta, consulta_cliente } = require('../controladores/banco');
+const { cadastro, informacoes, consulta_conta, consulta_cliente, atualizar, excluir } = require('../controladores/banco');
 const { banco_autenticacao } = require('../intermediarios/autenticacao');
+
 
 const rota_banco = express();
 
