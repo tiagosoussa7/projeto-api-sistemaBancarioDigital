@@ -6,15 +6,16 @@ const cadastro = async (req,res) => {
     const { nome, cpf, email, data_nascimento, senha } = req.body;
     
     if (!nome || !cpf || !email || !data_nascimento || !senha) { 
-        return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)}, todos os campos são obrigatórios.`});
+        return res.status(400).json({mensagem: `Cadastro negado: todos os campos são obrigatórios.`});
     }
     
-    if (idade_resposta(data_nascimento) < 18) {
-        return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} você tem ${idade_resposta(data_nascimento)} anos de idade e para abrir conta na instituição ${nome_resposta(req.banco.nome)} é necessário ter no mínimo 18 anos.`});
-    }
     
     try {
         if (nome && cpf && email && data_nascimento && senha ) {
+            
+            if (idade_resposta(data_nascimento) < 18) {
+                return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} você tem ${idade_resposta(data_nascimento)} anos de idade e para abrir conta na instituição ${nome_resposta(req.banco.nome)} é necessário ter no mínimo 18 anos.`});
+            }
             
             const email_cadastrado = await knex('dados_cliente').where({email}).first();
         
@@ -54,8 +55,11 @@ const cadastro = async (req,res) => {
             
             });
             
-            return res.status(200).json({mensagem: `Cadastro efetivado: Parabéns! ${nome_resposta(nome)} agora você é cliente do banco: ${nome_resposta(req.banco.nome)}`,});
+            return res.status(200).json({mensagem: `Cadastro efetivado: Parabéns! ${nome_resposta(nome)}, agora você é cliente do banco: ${nome_resposta(req.banco.nome)}`,});
         }    
+        
+        return res.status(200).json({mensagem: `Cadastro negado: OK`,});
+
     } catch (error) {
         return res.status(500).json({mensagem: `${error.message}`});
     }
