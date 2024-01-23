@@ -137,6 +137,54 @@ const atualizar = async (req, res) => {
     }
 }
 
+const excluir_contaCliente = async (req, res) => {
+    const { numero_conta, cpf } = req.body;
+
+    try {
+        if (numero_conta) {
+            const conta = await knex('dados_conta').where({numero_conta}).first();
+            const nome = await knex('dados_cliente').where({id_cliente: numero_conta}).select('nome').first();
+
+            if (!conta) return res.status(400).json({mensagem: `Exclusão negada: O numero de conta: ${numero_conta} não foi encontrado.`});
+            
+            if (parseFloat(conta.saldo) == 0) return res.status(400).json({mensagem: `Exclusão negada: conta de numero: ${numero_conta} possui saldo de ${conta.saldo}, solicitar ao cliente ${nome_resposta(nome.nome)} retirada total do saldo.`});
+            
+            knex.transaction( async (trx) => {
+    
+                await trx('dados_conta').where({numero_conta}).del();
+                await trx('dados_cliente').where({id_cliente: numero_conta}).del();
+                await trx('dados_banco').decrement('qtd_contas', 1);
+            });
+    
+            return res.status(200).json({mensagem: `Exclusão efetivada: a conta de número: ${numero_conta} foi excluída.`})
+        }
+        
+        if (cpf) {
+            const conta = await knex('dados_cliente').where({cpf}).first();
+            
+            if (!conta) return res.status(400).json({mensagem: `Exclusão negada: O CPF: ${cpf} não foi encontrado.`});
+            
+            const saldo = await knex('dados_conta').where({numero_conta: conta.id_cliente}).select('saldo').first();
+            
+            if (parseFloat(saldo.saldo) == 0) return res.status(400).json({mensagem: `Exclusão negada: conta de numero: ${conta.id_cliente} possui saldo de ${saldo.saldo}, solicitar ao cliente: ${nome_resposta(conta.nome)} retirada total do saldo.`});
+            
+            knex.transaction( async (trx) => {
+    
+                await trx('dados_conta').where({numero_conta: conta.id_cliente}).del();
+                await trx('dados_cliente').where({cpf}).del();
+                await trx('dados_banco').decrement('qtd_contas', 1);
+            });
+            
+            return res.status(200).json({mensagem: `Exclusão efetivada: a conta de número: ${conta.id_cliente} com CPF: ${cpf} vinculado foi excluída.`});
+        }
+            
+        return res.status(200).json({mensagem: 'Exclusão negada: preencha número da conta ou cpf do cliente.'});
+    
+    } catch (error) {
+        
+    }
+}
+
 const excluir = async (req, res) => {
     const { instituicao_nome, instituicao_senha } = req.body;
     const { id_banco, senha, nome } = req.banco;
@@ -174,15 +222,13 @@ const excluir = async (req, res) => {
     }
 }
         
-
-
-//res.status(200).json({mensagem: 'ok'})
 module.exports = {
     cadastro,
     informacoes,
     consulta_conta,
     consulta_cliente,
     atualizar,
+    excluir_contaCliente,
     excluir
 }
 
