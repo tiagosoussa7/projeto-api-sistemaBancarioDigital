@@ -12,7 +12,10 @@ const cadastro = async (req,res) => {
     
     try {
         if (nome && cpf && email && data_nascimento && senha ) {
+            const banco = await knex('dados_banco').select('id_banco').first();
             
+            if (!banco) return res.status(400).json({mensagem: 'Cadastro negado: sistema bancário digital está sem um banco controlador.'})
+
             if (idade_resposta(data_nascimento) < 18) {
                 return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} você tem ${idade_resposta(data_nascimento)} anos de idade e para abrir conta na instituição ${nome_resposta(req.banco.nome)} é necessário ter no mínimo 18 anos.`});
             }
@@ -64,7 +67,7 @@ const cadastro = async (req,res) => {
 }
 
 const informacao_cliente = async (req, res) => {
-
+    console.log(req.cliente);
     const cliente_informacoes = {
         Numero_conta: req.cliente.id_cliente,
         Nome: nome_resposta(req.cliente.nome),

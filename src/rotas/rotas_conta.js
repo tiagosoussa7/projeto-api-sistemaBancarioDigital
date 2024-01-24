@@ -1,10 +1,10 @@
 const express = require('express');
 const { cadastro, informacao_cliente, informacao_conta } = require('../controladores/conta');
-const { autenticacaoBanco, autenticacaoCliente } = require('../intermediarios/autenticacao.js');
+const { autenticacaoCliente } = require('../intermediarios/autenticacao.js');
 
 const rota_conta = express();
 
-rota_conta.post('/conta', autenticacaoBanco, cadastro);
+rota_conta.post('/conta', cadastro);
 
 rota_conta.use(autenticacaoCliente);
 rota_conta.get('/conta/informacao', informacao_conta);
