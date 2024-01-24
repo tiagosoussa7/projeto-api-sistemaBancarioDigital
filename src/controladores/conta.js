@@ -1,6 +1,6 @@
 const knex = require('../conexoes/knex');
 const bcrypt = require('bcrypt');
-const { idade_resposta, nome_resposta } = require('../validacoes/schema_resposta');
+const { idade_resposta, nome_resposta, data_resposta, hora_resposta } = require('../validacoes/schema_resposta');
 
 const cadastro = async (req,res) => {
     const { nome, cpf, email, data_nascimento, senha } = req.body;
@@ -57,15 +57,48 @@ const cadastro = async (req,res) => {
             
             return res.status(200).json({mensagem: `Cadastro efetivado: Parabéns! ${nome_resposta(nome)}, agora você é cliente do banco: ${nome_resposta(req.banco.nome)}`,});
         }    
-        
-        return res.status(200).json({mensagem: `Cadastro negado: OK`,});
 
     } catch (error) {
         return res.status(500).json({mensagem: `${error.message}`});
     }
 }
+
+const informacao_cliente = async (req, res) => {
+
+    const cliente_informacoes = {
+        Numero_conta: req.cliente.id_cliente,
+        Nome: nome_resposta(req.cliente.nome),
+        Idade: idade_resposta(req.cliente.data_nascimento),
+        CPF: req.cliente.cpf,
+        Data_nascimento: data_resposta(req.cliente.data_nascimento),
+        Email: req.cliente.email   
+    }
+    
+    return res.status(200).json({Informações_cliente: cliente_informacoes});
+}
+
+const informacao_conta = async ( req, res ) => {
+    const conta = await knex('dados_conta').where({numero_conta: req.cliente.id_cliente}).first();
+    
+    const dados_conta = {
+        Numero_conta: conta.numero_conta,
+        Nome: nome_resposta(req.cliente.nome),
+        Saldo: conta.saldo,
+        Total_saques: conta.total_saques,
+        Total_depositos: conta.total_depositos,
+        Numero_transferências: conta.qtd_transferencias,
+        Conta_aberta: data_resposta(conta.data_abertura),
+        Horário: hora_resposta(conta.hora_abertura)
+    }
+    
+    return res.status(200).json({Informações_conta: dados_conta});
+
+}
+
             
 
 module.exports = {
-    cadastro
+    cadastro,
+    informacao_cliente,
+    informacao_conta
 }
