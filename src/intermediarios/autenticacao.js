@@ -1,31 +1,41 @@
 const jwt = require('jsonwebtoken');
 const knex = require("../conexoes/knex");
+const { chave_banco, chave_cliente } = require('../validacoes/senhaHash');
+const { autenticacao_geral } = require('../validacoes/schema_autenticacao');
 
-const banco_autenticacao = async (req, res, next) => {
-    const { authorization } = req.headers;
-
-    if (!authorization) return res.status(401).json({mensagem: 'Não autorizado.'});
+const autenticacaoBanco = async (req, res, next) => {
+    const bancoKey = chave_banco, tabela_banco = 'dados_banco';
 
     try {
-        const token = authorization.split(' ')[1];
+        let dados_banco = await autenticacao_geral(tabela_banco, bancoKey, req, res);
 
-        if (!token) return res.status(400).json({mensagem: 'Não autorizado'});
-        
-        const { senha } = jwt.verify(token, 'senha_segura_token');
-        
-        const banco_cadastrado = await knex('dados_banco').where({ senha }).first();
-        
-        if (!banco_cadastrado) return res.status(401).json({mensagem: 'Não autorizado: o sistema bancario digital está offline.'});
+        req.banco = dados_banco;
+        console.log(req.banco);
 
-        req.banco = banco_cadastrado;
-     
         next();
-    
+
+    } catch (error) {
+        return res.status(500).json({mensagem: `${error.message}`});
+    }
+}
+
+const autenticacaoCliente = async (req, res, next) => {
+    const clienteKey = chave_cliente, tabela_cliente = 'dados_cliente';
+
+    try {
+        let dados_cliente = await autenticacao_geral(tabela_cliente, clienteKey, req, res);
+
+        req.cliente = dados_cliente;
+        console.log(req.cliente);
+
+        next();
+
     } catch (error) {
         return res.status(500).json({mensagem: `${error.message}`});
     }
 }
 
 module.exports = {
-    banco_autenticacao
+    autenticacaoBanco,
+    autenticacaoCliente
 }
