@@ -1,19 +1,18 @@
 const express = require('express');
 const { cadastro, informacoes, consulta_conta, consulta_cliente, atualizar, excluir_contaCliente, excluir } = require('../controladores/banco');
-const { banco_autenticacao } = require('../intermediarios/autenticacao');
+const { autenticacaoBanco } = require('../intermediarios/autenticacao');
 
 
 const rota_banco = express();
 
 rota_banco.post('/banco', cadastro);
 
-rota_banco.use(banco_autenticacao);
-rota_banco.get('/banco/informacao', informacoes);
-rota_banco.get('/banco/consultar/conta', consulta_conta);
-rota_banco.get('/banco/consultar/cliente', consulta_cliente);
-rota_banco.put('/banco', atualizar);
-rota_banco.delete('/banco/conta', excluir_contaCliente);
-rota_banco.delete('/banco', excluir);
+rota_banco.get('/banco/informacao', autenticacaoBanco, informacoes);
+rota_banco.get('/banco/consultar/conta', autenticacaoBanco, consulta_conta);
+rota_banco.get('/banco/consultar/cliente', autenticacaoBanco, consulta_cliente);
+rota_banco.put('/banco', autenticacaoBanco, atualizar);
+rota_banco.delete('/banco/conta', autenticacaoBanco, excluir_contaCliente);
+rota_banco.delete('/banco', autenticacaoBanco, excluir);
 
 
 module.exports = rota_banco;

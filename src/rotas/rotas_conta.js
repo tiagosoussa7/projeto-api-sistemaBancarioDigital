@@ -1,9 +1,13 @@
 const express = require('express');
-const { cadastro } = require('../controladores/conta');
-const { banco_autenticacao } = require('../intermediarios/autenticacao');
+const { cadastro, informacao_cliente, informacao_conta } = require('../controladores/conta');
+const { autenticacaoBanco, autenticacaoCliente } = require('../intermediarios/autenticacao.js');
 
 const rota_conta = express();
 
-rota_conta.post('/conta', banco_autenticacao, cadastro);
+rota_conta.post('/conta', autenticacaoBanco, cadastro);
+
+rota_conta.use(autenticacaoCliente);
+rota_conta.get('/conta/informacao', informacao_conta);
+rota_conta.get('/conta/informacao/cliente', informacao_cliente);
 
 module.exports = rota_conta;
