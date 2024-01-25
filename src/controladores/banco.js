@@ -4,6 +4,7 @@ const { conta_consultada, contas_consultadas } = require('../util/banco/util_con
 const { cliente_consultado, clientes_consultados } = require('../util/banco/util_consultaCliente.js');
 const { comparar_senha, criptar_senha, checar_cpf } = require('../util/util_funcionalidades.js');
 const { detalhar_banco } = require('../util/banco/util_informacao.js');
+const { deletar_dados } = require('../util/banco/util_excluirContaCliente.js');
 
 const cadastro = async (req,res) => {
     const { instituicao_nome, instituicao_senha } = req.body;
@@ -84,7 +85,6 @@ const atualizar = async (req, res) => {
     const { instituicao_nome, instituicao_senha } = req.body;
     const { id_banco, nome, senha } = req.banco;
     
-
     try {
         if ((instituicao_nome && instituicao_senha) || instituicao_nome || instituicao_senha) {
             
@@ -142,16 +142,11 @@ const excluir_contaCliente = async (req, res) => {
 
             if (!conta) return res.status(400).json({mensagem: `Exclusão negada: O numero de conta: ${numero_conta} não foi encontrado.`});
             
-            if (parseFloat(conta.saldo) == 0) return res.status(400).json({mensagem: `Exclusão negada: conta de numero: ${numero_conta} possui saldo de ${conta.saldo}, solicitar ao cliente ${nome_resposta(nome.nome)} retirada total do saldo.`});
+            if (parseFloat(conta.saldo) > 0) return res.status(400).json({mensagem: `Exclusão negada: conta de numero: ${numero_conta} possui saldo de ${conta.saldo}, solicitar ao cliente ${nome_resposta(nome.nome)} retirada total do saldo.`});
             
-            knex.transaction( async (trx) => {
-    
-                await trx('dados_conta').where({numero_conta}).del();
-                await trx('dados_cliente').where({id_cliente: numero_conta}).del();
-                await trx('dados_banco').decrement('qtd_contas', 1);
-            });
-    
-            return res.status(200).json({mensagem: `Exclusão efetivada: a conta de número: ${numero_conta} foi excluída.`})
+            await deletar_dados(numero_conta);
+
+            return res.status(200).json({mensagem: `Exclusão efetivada: a conta de número: ${numero_conta}, cliente ${nome_resposta(nome.nome)} foi excluída.`});
         }
         
         if (cpf) {
@@ -161,22 +156,17 @@ const excluir_contaCliente = async (req, res) => {
             
             const saldo = await knex('dados_conta').where({numero_conta: conta.id_cliente}).select('saldo').first();
             
-            if (parseFloat(saldo.saldo) == 0) return res.status(400).json({mensagem: `Exclusão negada: conta de numero: ${conta.id_cliente} possui saldo de ${saldo.saldo}, solicitar ao cliente: ${nome_resposta(conta.nome)} retirada total do saldo.`});
+            if (parseFloat(saldo.saldo) > 0) return res.status(400).json({mensagem: `Exclusão negada: conta de numero: ${conta.id_cliente} possui saldo de ${saldo.saldo}, solicitar ao cliente: ${nome_resposta(conta.nome)} retirada total do saldo.`});
             
-            knex.transaction( async (trx) => {
-    
-                await trx('dados_conta').where({numero_conta: conta.id_cliente}).del();
-                await trx('dados_cliente').where({cpf}).del();
-                await trx('dados_banco').decrement('qtd_contas', 1);
-            });
+            await deletar_dados(conta.id_cliente);
             
-            return res.status(200).json({mensagem: `Exclusão efetivada: a conta de número: ${conta.id_cliente} com CPF: ${cpf} vinculado foi excluída.`});
+            return res.status(200).json({mensagem: `Exclusão efetivada: a conta de número: ${conta.id_cliente}, cliente ${conta.nome} e com CPF: ${cpf} vinculado foi excluída.`});
         }
             
         return res.status(200).json({mensagem: 'Exclusão negada: preencha número da conta ou cpf do cliente.'});
     
     } catch (error) {
-        
+        return res.status(500).json(`${error.message}`)
     }
 }
 
