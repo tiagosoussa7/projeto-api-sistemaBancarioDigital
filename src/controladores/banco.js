@@ -1,9 +1,9 @@
 const knex = require('../conexoes/knex');
-const bcrypt = require('bcrypt');
 const { data_resposta, hora_resposta, nome_resposta, idade_resposta } = require('../util/util_resposta.js');
 const { conta_consultada, contas_consultadas } = require('../util/banco/util_consultaConta.js');
 const { cliente_consultado, clientes_consultados } = require('../util/banco/util_consultaCliente.js');
 const { comparar_senha, criptar_senha, checar_cpf } = require('../util/util_funcionalidades.js');
+const { detalhar_banco } = require('../util/banco/util_informacao.js');
 
 const cadastro = async (req,res) => {
     const { instituicao_nome, instituicao_senha } = req.body;
@@ -27,7 +27,7 @@ const cadastro = async (req,res) => {
                 }
             }
         
-            const senha_criptografada = await bcrypt.hash(instituicao_senha, 10); 
+            const senha_criptografada = await criptar_senha(instituicao_senha);
         
             await knex('dados_banco').insert({
                 nome: instituicao_nome,
@@ -45,16 +45,9 @@ const cadastro = async (req,res) => {
 }
 
 const informacoes = async (req, res) => {
+    const { banco } = req;
 
-    const banco_informacoes = {
-        Banco_cadastrada: nome_resposta(req.banco.nome),
-        Contas_ativas: req.banco.qtd_contas,
-        Orçamento_total: req.banco.orcamento,
-        Sistema_ativado: data_resposta(req.banco.data_ativacao),
-        Horario: hora_resposta(req.banco.hora_ativacao)
-    }
-    
-    return res.status(200).json({Informações_banco: banco_informacoes});
+    return detalhar_banco(banco, res);
 }
 
 const consulta_conta = async (req, res) => {

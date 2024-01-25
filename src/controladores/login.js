@@ -1,4 +1,5 @@
 const knex = require("../conexoes/knex");
+const { checar_cpf, checar_email } = require("../util/util_funcionalidades");
 const { gerar_token } = require("../util/util_login");
 const { nome_resposta } = require('../util/util_resposta');
 const { chave_banco, chave_cliente } = require("../validacoes/senhaHash");
@@ -19,7 +20,7 @@ const login_banco = async (req, res) => {
             return gerar_token(banco_cadastrado, bancoKey, instituicao_senha, res);
         }
                 
-        return res.status(400).json({mensagem: 'Login negado: todos os campos são obrigatórios.'});
+        return res.status(400).json({mensagem: `Login negado: o campo ${instituicao_nome ? 'senha da instituição' : 'nome da instituição'} é obrigatório.`});
         
     } catch (error) {
         return res.status(500).json({mensagem: `${error.message}`});
@@ -35,7 +36,7 @@ const login_conta = async (req, res) => {
             
             if (cpf) {
                 
-                const cpf_cadastrado = await knex('dados_cliente').where({cpf}).first();
+                const cpf_cadastrado = await checar_cpf(cpf);
                 
                 if (!cpf_cadastrado) return res.status(400).json({mensagem: `Login negado: o CPF ${cpf} não foi encontrado.`}); 
                 
@@ -43,7 +44,7 @@ const login_conta = async (req, res) => {
             }
             
             if(email) {
-                const email_cadastrado = await knex('dados_cliente').where({email}).first();
+                const email_cadastrado = await checar_email(email);
 
                 if (!email_cadastrado) return res.status(400).json({mensagem: `Login negado: o email ${email} não foi encontrado.`}); 
                 
@@ -51,7 +52,7 @@ const login_conta = async (req, res) => {
             }
         }
         
-        return res.status(400).json({mensagem: 'Login negado: todos os campos são obrigatórios.'});
+        return res.status(400).json({mensagem: `Login negado: o campo ${cpf || email ? 'senha' : 'CPF ou email'} é obrigatório.`});
     
     } catch (error) {
         return res.status(500).json({mensagem: `${error.message}`});        

@@ -21,9 +21,17 @@ async function checar_email(dado) {
     return email;
 }
 
+async function checar_banco() {
+    const banco = await knex('dados_banco').select('nome', 'senha').first();
+    return banco;
+}
+
+
+
 module.exports = {
     comparar_senha,
     criptar_senha,
     checar_cpf,
-    checar_email
+    checar_email,
+    checar_banco
 }

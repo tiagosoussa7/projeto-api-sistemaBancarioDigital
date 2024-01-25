@@ -1,9 +1,9 @@
 const jwt = require('jsonwebtoken');
-const bcrypt = require('bcrypt');
+const { comparar_senha } = require('./util_funcionalidades');
 
 async function gerar_token(dado, chave, senha, res) {
             
-    const senha_cadastrada = await bcrypt.compare(senha, dado.senha);
+    const senha_cadastrada = await comparar_senha(senha, dado.senha); 
 
     if (!senha_cadastrada) return res.status(400).json({mensagem: 'Senha inválida.'});
 

@@ -1,9 +1,9 @@
 const knex = require('../conexoes/knex');
-const bcrypt = require('bcrypt');
-const { idade_resposta, nome_resposta, data_resposta, hora_resposta } = require('../util/util_resposta');
-const { checar_email, checar_senha, checar_cpf, criptar_senha, comparar_senha } = require('../util/util_funcionalidades');
-const { detalhar_cliente } = require('../util/conta/util_informacaoCliente');
+const { idade_resposta, nome_resposta, data_resposta } = require('../util/util_resposta');
+const { checar_email, checar_cpf, criptar_senha, comparar_senha } = require('../util/util_funcionalidades');
+const { inserir_cliente } = require('../util/conta/util_cadastro');
 const { detalhar_conta } = require('../util/conta/util_informacaoConta');
+const { detalhar_cliente } = require('../util/conta/util_informacaoCliente');
 
 const cadastro = async (req,res) => {
     const { nome, cpf, email, data_nascimento, senha } = req.body;
@@ -12,58 +12,33 @@ const cadastro = async (req,res) => {
         return res.status(400).json({mensagem: `Cadastro negado: todos os campos são obrigatórios.`});
     }
     
-    
     try {
-        //if (nome && cpf && email && data_nascimento && senha ) {
-            const banco = await knex('dados_banco').select('id_banco', 'nome').first();
+        const banco = await knex('dados_banco').select('id_banco', 'nome').first();
             
-            if (!banco) return res.status(400).json({mensagem: 'Cadastro negado: sistema bancário digital está sem um banco controlador.'});
+        if (!banco) return res.status(400).json({mensagem: 'Cadastro negado: sistema bancário digital está sem um banco controlador.'});
 
-            if (idade_resposta(data_nascimento) < 18) {
-                return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} você tem ${idade_resposta(data_nascimento)} anos de idade e para abrir conta na instituição ${nome_resposta(banco.nome)} é necessário ter no mínimo 18 anos.`});
-            }
+        if (idade_resposta(data_nascimento) < 18) {
+            return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} você tem ${idade_resposta(data_nascimento)} anos de idade e para abrir conta na instituição ${nome_resposta(banco.nome)} é necessário ter no mínimo 18 anos.`});
+        }
             
-            const email_cadastrado = await checar_email(email);
+        const email_cadastrado = await checar_email(email);
         
-            if (email_cadastrado) {
-                return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} o email: ${email} já está cadastrado no banco: ${nome_resposta(banco.nome)}.`});
-            }
+        if (email_cadastrado) {
+            return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} o email: ${email} já está cadastrado no banco: ${nome_resposta(banco.nome)}.`});
+        }
         
-            const cpf_cadastrado = await checar_cpf(cpf);
+        const cpf_cadastrado = await checar_cpf(cpf);
         
-            if (cpf_cadastrado) {
-                return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} o CPF: ${cpf} já está cadastrado no banco: ${nome_resposta(banco.nome)}.`});
-            }
+        if (cpf_cadastrado) {
+            return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} o CPF: ${cpf} já está cadastrado no banco: ${nome_resposta(banco.nome)}.`});
+        }
 
-            const senha_criptografada = await criptar_senha(senha);
+        const senha_criptografada = await criptar_senha(senha);
 
-            knex.transaction(async (trx) => {
-
-                const [cliente_cadastrado]  = await trx('dados_cliente').insert({
-                    nome,
-                    cpf,
-                    email,
-                    data_nascimento,
-                    senha: senha_criptografada,
-                    id_banco: banco.id_banco
-                }).returning('id_cliente');
+        await inserir_cliente(nome, cpf, email, data_nascimento, senha_criptografada, banco);
             
-                if (!cliente_cadastrado) {
-                    res.status(400).json({ mensagem: 'O cadastro não foi realizado' });
-                }
-            
-                await trx('dados_conta').insert({
-                    numero_conta: cliente_cadastrado.id_cliente,
-                    id_banco: banco.id_banco
-                }).returning('*');
-            
-                await trx('dados_banco').increment('qtd_contas', 1);
-            
-            });
-            
-            return res.status(200).json({mensagem: `Cadastro efetivado: Parabéns! ${nome_resposta(nome)}, agora você é cliente do banco: ${nome_resposta(banco.nome)}`,});
-        //}    
-
+        return res.status(200).json({mensagem: `Cadastro efetivado: Parabéns! ${nome_resposta(nome)}, agora você é cliente do banco: ${nome_resposta(banco.nome)}`,});
+       
     } catch (error) {
         return res.status(500).json({mensagem: `${error.message}`});
     }
@@ -95,18 +70,15 @@ const atualizar = async (req, res) => {
         
         if (email === cliente.email) return res.status(400).json({mensagem: `Atualização negada: o email ${email} é o mesmo email do cadastro.`});
                 
-        if (email !== cliente.email){
-            const email_cadastrado = await checar_email(email);
+        if (email !== cliente.email){ const email_cadastrado = await checar_email(email);
             
             if(email_cadastrado) return res.status(400).json({mensagem: `Atualização negada: o email ${email} já está cadastrado.`});
         }    
     
         if (data_nascimento === data_resposta(cliente.data_nascimento)) return res.status(400).json({mensagem: `Atualização negada: a data de nascimento ${data_nascimento} é a mesma do cadastro.`});
     
-        if(idade_resposta(data_nascimento) < 18) {
-            return res.status(400).json({mensagem: `Atualização negada: não é aceito data de nascimento menor de 18 anos.`});
-        }
-
+        if(idade_resposta(data_nascimento) < 18) return res.status(400).json({mensagem: `Atualização negada: não é aceito data de nascimento menor de 18 anos.`});
+        
         const senha_comparadas = await comparar_senha(senha, cliente.senha);
 
         if(senha_comparadas) return res.status(400).json({mensagem: 'Atualização negada: a senha de atualização é a mesma do cadastro.'});
