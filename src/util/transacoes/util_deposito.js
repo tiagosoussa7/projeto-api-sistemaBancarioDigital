@@ -9,6 +9,7 @@ async function registrar_deposito( cliente, banco, valor) {
         });
 
         await trx('dados_conta').increment('total_depositos', parseFloat(valor)).where({numero_conta: cliente.id_cliente});
+        await trx('dados_conta').increment('saldo', parseFloat(valor)).where({numero_conta: cliente.id_cliente});
         await trx('dados_banco').increment('orcamento', parseFloat(valor));
     }); 
 }
