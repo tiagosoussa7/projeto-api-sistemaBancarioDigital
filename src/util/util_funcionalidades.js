@@ -26,6 +26,10 @@ async function checar_banco() {
     return banco;
 }
 
+async function checar_saldo(dado) {
+    const saldo = await knex('dados_conta').where({numero_conta: dado}).first();
+    return saldo.saldo;
+}
 
 
 module.exports = {
@@ -33,5 +37,6 @@ module.exports = {
     criptar_senha,
     checar_cpf,
     checar_email,
-    checar_banco
+    checar_banco,
+    checar_saldo
 }

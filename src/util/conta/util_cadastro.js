@@ -1,6 +1,6 @@
 const knex = require("../../conexoes/knex");
 
-async function inserir_cliente(nome, cpf, email, data_nascimento, senha_criptografada, banco) {
+async function cadastrar_cliente(nome, cpf, email, data_nascimento, senha_criptografada, banco) {
 
     knex.transaction(async (trx) => {
         const [cliente_cadastrado]  = await trx('dados_cliente').insert({
@@ -23,5 +23,5 @@ async function inserir_cliente(nome, cpf, email, data_nascimento, senha_criptogr
 }
 
 module.exports = {
-    inserir_cliente
+    cadastrar_cliente
 }

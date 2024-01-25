@@ -1,6 +1,7 @@
 const knex = require("../../conexoes/knex");
 
 async function deletar_banco(dado) {
+    
     await knex.transaction(async (trx) => {
                 
         await trx('dados_conta').where({ id_banco: dado }).del();
