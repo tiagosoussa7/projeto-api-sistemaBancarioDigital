@@ -22,7 +22,7 @@ async function checar_email(dado) {
 }
 
 async function checar_banco() {
-    const banco = await knex('dados_banco').select('nome', 'senha').first();
+    const banco = await knex('dados_banco').select('*').first();
     return banco;
 }
 
