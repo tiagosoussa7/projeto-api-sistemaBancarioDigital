@@ -1,6 +1,6 @@
 const knex = require("../conexoes/knex");
-const { gerar_token } = require("../validacoes/schema_login");
-const { nome_resposta } = require('../validacoes/schema_resposta');
+const { gerar_token } = require("../util/util_login");
+const { nome_resposta } = require('../util/util_resposta');
 const { chave_banco, chave_cliente } = require("../validacoes/senhaHash");
 
 const login_banco = async (req, res) => {

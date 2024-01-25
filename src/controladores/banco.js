@@ -1,8 +1,9 @@
 const knex = require('../conexoes/knex');
 const bcrypt = require('bcrypt');
-const { data_resposta, hora_resposta, nome_resposta, idade_resposta } = require('../validacoes/schema_resposta');
-const { conta_consultada, contas_consultadas } = require('../validacoes/schema_banco/schema_consultaConta.js');
-const { cliente_consultado, clientes_consultados } = require('../validacoes/schema_banco/schema_consultaCliente.js');
+const { data_resposta, hora_resposta, nome_resposta, idade_resposta } = require('../util/util_resposta.js');
+const { conta_consultada, contas_consultadas } = require('../util/banco/util_consultaConta.js');
+const { cliente_consultado, clientes_consultados } = require('../util/banco/util_consultaCliente.js');
+const { comparar_senha, criptar_senha, checar_cpf } = require('../util/util_funcionalidades.js');
 
 const cadastro = async (req,res) => {
     const { instituicao_nome, instituicao_senha } = req.body;
@@ -85,6 +86,7 @@ const consulta_cliente = async (req, res) => {
         return res.status(500).json({mensagem: `${error.message}`});
     }
 }
+
 const atualizar = async (req, res) => {
     const { instituicao_nome, instituicao_senha } = req.body;
     const { id_banco, nome, senha } = req.banco;
@@ -97,11 +99,11 @@ const atualizar = async (req, res) => {
                 
                 if (instituicao_nome === nome) return res.status(400).json({mensagem: `Atualização negada: o nome ${nome_resposta(instituicao_nome) } é o mesmo do banco controlador do sistema.`});
 
-                const comparar_senha = await bcrypt.compare(instituicao_senha, senha);
+                const senha_comparada = await comparar_senha(instituicao_senha, senha);
                 
-                if (comparar_senha) return res.status(401).json({mensagem: `Atualização negada: a senha da atualização é a mesma do banco cadastrado no sistema.`});
+                if (senha_comparada) return res.status(401).json({mensagem: `Atualização negada: a senha da atualização é a mesma do banco cadastrado no sistema.`});
             
-                const senha_criptografada = await bcrypt.hash(instituicao_senha, 10);
+                const senha_criptografada = await criptar_senha(instituicao_senha);
                 
                 await knex('dados_banco').where({ id_banco }).update({nome: instituicao_nome, senha: senha_criptografada });
                 
@@ -118,11 +120,11 @@ const atualizar = async (req, res) => {
             
             if (instituicao_senha) { 
                 
-                const comparar_senha = await bcrypt.compare(instituicao_senha, senha);
+                const senha_comparada = await comparar_senha(instituicao_senha, senha);
                 
-                if (comparar_senha) return res.status(401).json({mensagem: `Atualização negada: a senha da atualização é a mesma do banco cadastrado no sistema.`});
+                if (senha_comparada) return res.status(401).json({mensagem: `Atualização negada: a senha da atualização é a mesma do banco cadastrado no sistema.`});
             
-                const senha_criptografada = await bcrypt.hash(instituicao_senha, 10);
+                const senha_criptografada = await criptar_senha(instituicao_senha);
                 
                 await knex('dados_banco').where({ id_banco }).update({senha: senha_criptografada });
                 
@@ -160,7 +162,7 @@ const excluir_contaCliente = async (req, res) => {
         }
         
         if (cpf) {
-            const conta = await knex('dados_cliente').where({cpf}).first();
+            const conta = await checar_cpf(cpf);
             
             if (!conta) return res.status(400).json({mensagem: `Exclusão negada: O CPF: ${cpf} não foi encontrado.`});
             
@@ -198,15 +200,15 @@ const excluir = async (req, res) => {
             
             if (instituicao_nome !== nome) return res.status(400).json({mensagem: `Exclusão negada: o banco ${nome_resposta(instituicao_nome)} não é o controlador atual do sistema.`}); 
             
-            const senha_correta = await bcrypt.compare(instituicao_senha, senha);
+            const senha_comparadas = await comparar_senha(instituicao_senha, senha);
 
-            if (!senha_correta) return res.status(400).json({mensagem: 'Exclusão negada: senha inválida.'});
+            if (!senha_comparadas) return res.status(400).json({mensagem: 'Exclusão negada: senha inválida.'});
     
             await knex.transaction(async (trx) => {
                 
                 await trx('dados_conta').where({ id_banco}).del();
                 await trx('dados_cliente').where({ id_banco}).del();
-                //await trx('transacoes').where({}).del();
+                //await trx('transacoes').where({ id_banco }).del();
           
                 await trx('dados_banco').where({ id_banco }).del();
           
