@@ -16,12 +16,11 @@ const deposito = async (req, res) => {
         await registrar_deposito(cliente, await checar_banco(), valor);
 
         return res.status(200).json({mensagem: `Deposito efetivado: o valor de ${valor} ${ parseFloat(valor) == 1 ? 'real' : 'reais'} foi depositado na sua conta ${nome_resposta(cliente.nome)}`})
-        
     } catch (error) {
         return res.status(500).json({mensagem: `${error.message}`});
     }
-    
 }
+    
 const saque = async (req, res) => {
     const { cliente } = req;
     const { valor, senha } = req.body;
@@ -40,11 +39,10 @@ const saque = async (req, res) => {
         await registrar_saque(cliente, await checar_banco(), valor);
         
         return res.status(200).json({mensagem: `Saque efetivado: o valor de ${valor} ${ parseFloat(valor) == 1 ? 'real' : 'reais'} foi sacado da sua conta ${nome_resposta(cliente.nome)}`});
-    
     } catch (error) {
         return res.status(500).json({mensagem: `${error.message}`});
     }
-}
+}    
    
 const transferencia = async (req, res) => {
     const { cliente } = req;
@@ -68,13 +66,11 @@ const transferencia = async (req, res) => {
         await registrar_transferencia(cliente, conta_destino, await checar_banco(), valor);
 
         return res.status(400).json({mensagem: `Tranferência efetivada: ${nome_resposta(cliente.nome)} o valor de ${valor} ${valor == 1 ? 'real' : 'reais'} foi transferido para a conta de número: ${conta_destino}.`})
-    
     } catch (error) {
         return res.status(500).json({mensagem: `${error.message}`});
     }
-
 }
-
+    
 module.exports = {
     deposito,
     saque,

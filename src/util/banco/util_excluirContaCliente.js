@@ -9,6 +9,12 @@ async function deletar_dados(dado) {
     });
 }
 
+async function nome(dado) {
+    const nome = await knex('dados_cliente').where({id_cliente: dado}).select('nome').first();
+    return nome.nome;
+}
+
 module.exports = {
-    deletar_dados
+    deletar_dados,
+    nome
 }

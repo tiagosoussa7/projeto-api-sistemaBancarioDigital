@@ -10,7 +10,6 @@ const autenticacaoBanco = async (req, res, next) => {
         req.banco = dados_banco;
 
         next();
-
     } catch (error) {
         return res.status(500).json({mensagem: `${error.message}`});
     }
@@ -25,7 +24,6 @@ const autenticacaoCliente = async (req, res, next) => {
         req.cliente = dados_cliente;
 
         next();
-
     } catch (error) {
         return res.status(500).json({mensagem: `${error.message}`});
     }

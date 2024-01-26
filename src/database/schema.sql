@@ -32,7 +32,7 @@ create table dados_conta (
 );
 
 create table dados_depositos (
-  numero_conta int references dados_conta(id_conta),
+  numero_conta int references dados_cliente(id_cliente),
   valor decimal(10, 2),
   data date default current_date,
   hora time default current_time,
@@ -40,7 +40,7 @@ create table dados_depositos (
 );
 
 create table dados_saques (
-  numero_conta int references dados_conta(id_conta),
+  numero_conta int references dados_cliente(id_cliente),
   valor decimal(10, 2),
   data date default current_date,
   hora time default current_time,
@@ -48,9 +48,9 @@ create table dados_saques (
 );
 
 create table dados_transferencias (
-  numero_conta int references dados_conta(id_conta),
+  numero_conta int references dados_cliente(id_cliente),
   valor decimal(10, 2),
-  conta_destino int references dados_conta(id_conta),
+  conta_destino int references dados_cliente(id_cliente),
   data date default current_date,
   hora time default current_time,
   id_banco int references dados_banco(id_banco) on delete cascade
