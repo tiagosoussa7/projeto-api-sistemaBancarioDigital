@@ -8,7 +8,7 @@ create table dados_banco (
   data_ativacao date default current_date,
   hora_ativacao time default current_time,
   senha varchar(255) not null
- );
+);
   
 create table dados_cliente (
   id_cliente serial primary key,
@@ -18,7 +18,7 @@ create table dados_cliente (
   data_nascimento date not null,
   senha varchar(255) not null,
   id_banco int references dados_banco(id_banco) on delete cascade
- );
+);
 
 create table dados_conta (
   numero_conta int references dados_cliente(id_cliente),
@@ -29,4 +29,29 @@ create table dados_conta (
   data_abertura date default current_date,
   hora_abertura time default current_time,
   id_banco int references dados_banco(id_banco) on delete cascade
- );
+);
+
+create table dados_depositos (
+  numero_conta int references dados_conta(id_conta),
+  valor decimal(10, 2),
+  data date default current_date,
+  hora time default current_time,
+  id_banco int references dados_banco(id_banco) on delete cascade
+);
+
+create table dados_saques (
+  numero_conta int references dados_conta(id_conta),
+  valor decimal(10, 2),
+  data date default current_date,
+  hora time default current_time,
+  id_banco int references dados_banco(id_banco) on delete cascade
+);
+
+create table dados_transferencias (
+  numero_conta int references dados_conta(id_conta),
+  valor decimal(10, 2),
+  conta_destino int references dados_conta(id_conta),
+  data date default current_date,
+  hora time default current_time,
+  id_banco int references dados_banco(id_banco) on delete cascade
+);
