@@ -1,10 +1,11 @@
 const knex = require('../conexoes/knex');
-const { idade_resposta, nome_resposta, data_resposta } = require('../util/util_resposta');
+const { idade_resposta, nome_resposta, data_resposta, hora_resposta } = require('../util/util_resposta');
 const { checar_email, checar_cpf, criptar_senha, comparar_senha, checar_saldo } = require('../util/util_funcionalidades');
 const { cadastrar_cliente } = require('../util/conta/util_cadastro');
 const { detalhar_conta } = require('../util/conta/util_informacaoConta');
 const { detalhar_cliente } = require('../util/conta/util_informacaoCliente');
 const { excluir_cliente } = require('../util/conta/util_excluir');
+const { extrato_deposito, detalhar_extrato, detalhar_depositos, detalhar_saques, detalhar_transferencias } = require('../util/conta/util_extrato');
 
 const cadastro = async (req,res) => {
     const { nome, cpf, email, data_nascimento, senha } = req.body;
@@ -57,6 +58,36 @@ const informacao_cliente = async (req, res) => {
     const dataFormatada = cliente.data_nascimento.toString();
     
     return detalhar_cliente(cliente, dataFormatada, res);
+}
+
+const extrato = async (req, res) => {
+    const { cliente } = req;
+    const { transacao } = req.body;
+    const tabela_deposito = 'dados_depositos';
+    const tabela_saque = 'dados_saques';
+    
+    try {
+        if ( transacao == 'deposito') {
+            return await detalhar_depositos(tabela_deposito, cliente, res);
+        }
+
+        if ( transacao == 'saque') {
+            return await detalhar_saques(tabela_saque, cliente, res);
+        }
+        
+        if (transacao == 'transferencia') {
+            return await detalhar_transferencias(cliente, res);
+        }
+    
+        return res.status(200).json({mensagem: `Extrato negado: ${nome_resposta(cliente.nome)} é obrigatório especificar qual o tipo da transação.`})
+
+    } catch (error) {
+        return res.status(500).json({mensagem: `${error.message}`});
+    }
+
+
+        
+
 }
 
 const atualizar = async (req, res) => {
@@ -127,6 +158,7 @@ module.exports = {
     cadastro,
     informacao_conta,
     informacao_cliente,
+    extrato,
     atualizar,
     excluir
 }

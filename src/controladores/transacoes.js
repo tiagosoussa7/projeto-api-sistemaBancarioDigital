@@ -1,4 +1,3 @@
-const knex = require('../conexoes/knex');
 const { registrar_deposito } = require('../util/transacoes/util_deposito');
 const { registrar_saque } = require('../util/transacoes/util_saque');
 const { registrar_transferencia } = require('../util/transacoes/util_transferencia');
@@ -46,9 +45,7 @@ const saque = async (req, res) => {
         return res.status(500).json({mensagem: `${error.message}`});
     }
 }
-
-
-    
+   
 const transferencia = async (req, res) => {
     const { cliente } = req;
     const { conta_destino, valor, senha } = req.body;
