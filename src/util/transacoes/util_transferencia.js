@@ -1,10 +1,11 @@
 const knex = require("../../conexoes/knex");
 
 async function registrar_transferencia( cliente, conta_destino, banco, valor) {
+    
     knex.transaction( async (trx) => {
         await trx('dados_transferencias').insert({
             numero_conta: cliente.id_cliente,
-            valor_transferencias: parseFloat(valor),
+            valor: parseFloat(valor),
             conta_destino: conta_destino,
             id_banco: banco.id_banco
         });

@@ -4,7 +4,7 @@ async function registrar_deposito( cliente, banco, valor) {
     knex.transaction( async (trx) => {
         await trx('dados_depositos').insert({
             numero_conta: cliente.id_cliente,
-            valor_deposito: parseFloat(valor),
+            valor: parseFloat(valor),
             id_banco: banco.id_banco
         });
 
