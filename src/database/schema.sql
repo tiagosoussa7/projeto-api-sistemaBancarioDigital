@@ -21,7 +21,7 @@ create table dados_cliente (
 );
 
 create table dados_conta (
-  numero_conta int references dados_cliente(id_cliente),
+  numero_conta int references dados_cliente(id_cliente) on delete cascade,
   saldo decimal(10, 2) default 0,
   total_saques decimal(10, 2) default 0,
   total_depositos decimal(10, 2) default 0,
@@ -32,7 +32,7 @@ create table dados_conta (
 );
 
 create table dados_depositos (
-  numero_conta int references dados_cliente(id_cliente),
+  numero_conta int references dados_cliente(id_cliente) on delete cascade,
   valor decimal(10, 2),
   data date default current_date,
   hora time default current_time,
@@ -40,18 +40,27 @@ create table dados_depositos (
 );
 
 create table dados_saques (
-  numero_conta int references dados_cliente(id_cliente),
+  numero_conta int references dados_cliente(id_cliente) on delete cascade,
   valor decimal(10, 2),
   data date default current_date,
   hora time default current_time,
   id_banco int references dados_banco(id_banco) on delete cascade
 );
 
-create table dados_transferencias (
-  numero_conta int references dados_cliente(id_cliente),
+create table transferencias_enviadas (
+  conta_origem int references dados_cliente(id_cliente) on delete cascade,
   valor decimal(10, 2),
-  conta_destino int references dados_cliente(id_cliente),
+  conta_destino int,
   data date default current_date,
   hora time default current_time,
   id_banco int references dados_banco(id_banco) on delete cascade
 );
+
+create table transferencias_recebidas (
+  conta_destino int references dados_cliente(id_cliente) on delete cascade, 
+  valor decimal(10, 2),
+  conta_origem int,
+  data date default current_date,
+  hora time default current_time,
+  id_banco int references dados_banco(id_banco) on delete cascade
+ );

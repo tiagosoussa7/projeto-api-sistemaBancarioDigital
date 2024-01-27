@@ -11,8 +11,8 @@ async function detalhar_saques(tabela, cliente, res) {
 
 async function detalhar_transferencias(cliente, res) {
     
-    const enviados = await knex('dados_transferencias').where({numero_conta: cliente.id_cliente}).select('*');
-    const recebidos = await knex('dados_transferencias').where({conta_destino: cliente.id_cliente}).select('*');
+    const enviados = await knex('transferencias_enviadas').where({conta_origem: cliente.id_cliente}).select('*');
+    const recebidos = await knex('transferencias_recebidas').where({conta_destino: cliente.id_cliente}).select('*');
             
             const dadosEnviados = enviados.map((enviado) => ({
                 Conta_destino: enviado.conta_destino,
@@ -22,7 +22,7 @@ async function detalhar_transferencias(cliente, res) {
             }));
             
             const dadosRecebidos = recebidos.map((recebido) => ({
-                Conta_origem: recebido.numero_conta,
+                Conta_origem: recebido.conta_origem,
                 Valor: recebido.valor,
                 Data: data_resposta(recebido.data),
                 Horário: hora_resposta(recebido.hora)

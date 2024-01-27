@@ -1,29 +1,50 @@
-const { chave_banco, chave_cliente } = require('../validacoes/senhaHash');
-const { autenticacao_geral } = require('../util/util_autenticacao');
+const jwt = require('jsonwebtoken');
+const knex = require('../conexoes/knex');
+const { chave_banco, chave_conta } = require('../validacoes/senhaHash');
 
 const autenticacaoBanco = async (req, res, next) => {
-    const bancoKey = chave_banco, tabela_banco = 'dados_banco';
-
     try {
-        let dados_banco = await autenticacao_geral(tabela_banco, bancoKey, req, res);
-
-        req.banco = dados_banco;
-
+        const { authorization } = req.headers;
+    
+        if (!authorization) return res.status(401).json({mensagem: 'Não autorizado.'});
+        
+        const token = authorization.split(' ')[1];
+    
+        if (!token) return res.status(400).json({mensagem: 'Não autorizado.'});
+        
+        const { senha } = jwt.verify(token, chave_banco);
+    
+        const cadastro = await knex('dados_banco').where({ senha }).first();
+    
+        if (!cadastro) return res.status(401).json({mensagem: 'Não autorizado: sistema bancário digital offline.'});
+    
+        req.banco = cadastro;
+    
         next();
     } catch (error) {
         return res.status(500).json({mensagem: `${error.message}`});
     }
 }
 
-const autenticacaoCliente = async (req, res, next) => {
-    const clienteKey = chave_cliente, tabela_cliente = 'dados_cliente';
-
+const autenticacaoConta = async (req, res, next) => {
     try {
-        let dados_cliente = await autenticacao_geral(tabela_cliente, clienteKey, req, res);
+    const { authorization } = req.headers;
 
-        req.cliente = dados_cliente;
+    if (!authorization) return res.status(401).json({mensagem: 'Não autorizado.'});
+    
+    const token = authorization.split(' ')[1];
 
-        next();
+    if (!token) return res.status(400).json({mensagem: 'Não autorizado.'});
+    
+    const { senha } = jwt.verify(token, chave_conta);
+
+    const cadastro = await knex('dados_cliente').where({ senha }).first();
+
+    if (!cadastro) return res.status(401).json({mensagem: 'Não autorizado.'});
+
+    req.cliente = cadastro;
+
+    next();
     } catch (error) {
         return res.status(500).json({mensagem: `${error.message}`});
     }
@@ -31,5 +52,5 @@ const autenticacaoCliente = async (req, res, next) => {
 
 module.exports = {
     autenticacaoBanco,
-    autenticacaoCliente
+    autenticacaoConta
 }

@@ -1,18 +1,7 @@
 const knex = require("../../conexoes/knex");
 
-async function excluir_banco(dado) {
-    
-    await knex.transaction(async (trx) => {
-                
-        await trx('dados_transferencias').where({ id_banco: dado }).del();
-        await trx('dados_saques').where({ id_banco: dado }).del();
-        await trx('dados_depositos').where({ id_banco: dado }).del();
-        await trx('dados_conta').where({ id_banco: dado }).del();
-        await trx('dados_cliente').where({ id_banco: dado }).del();
-  
-        await trx('dados_banco').where({ id_banco: dado }).del();
-  
-    });  
+async function del_banco(dado) {
+        await knex('dados_banco').where({ id_banco: dado }).del(); 
 }
 
 async function somar_saldos(dado) {
@@ -28,6 +17,6 @@ async function somar_saldos(dado) {
 }
 
 module.exports = {
-    excluir_banco,
+    del_banco,
     somar_saldos
 }

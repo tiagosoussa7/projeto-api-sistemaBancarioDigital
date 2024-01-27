@@ -1,6 +1,6 @@
 const { registrar_deposito } = require('../util/transacoes/util_deposito');
 const { registrar_saque } = require('../util/transacoes/util_saque');
-const { registrar_transferencia } = require('../util/transacoes/util_transferencia');
+const { insert_transferencia } = require('../util/transacoes/util_transferencia');
 const { checar_banco, comparar_senha, checar_saldo, checar_conta } = require('../util/util_funcionalidades');
 const { nome_resposta } = require('../util/util_resposta');
 
@@ -51,9 +51,9 @@ const transferencia = async (req, res) => {
     if (!conta_destino || !valor || !senha) return res.status(400).json({mensagem: `${nome_resposta(cliente.nome)} todos os campos são obrigatórios.`});
 
     try {
-        if (cliente.id_cliente == conta_destino) return res.status(400).json({mensagem: `Transferência negada: ${nome_resposta(cliente.nome)} conta origem e conta destino são iguais.`});
+        if (cliente.id_cliente == conta_destino) return res.status(400).json({mensagem: `Transferência negada: ${nome_resposta(cliente.nome)} o número de conta: ${conta_destino} informado é o seu.`});
 
-        if (!await checar_conta(conta_destino)) return res.status(400).json({mensagem: `Transferência negada: ${nome_resposta(cliente.nome)} a conta destino informada não existe.`});
+        if (!await checar_conta(conta_destino)) return res.status(400).json({mensagem: `Transferência negada: ${nome_resposta(cliente.nome)} o numero da conta: ${conta_destino} informada não existe.`});
         
         if (valor == 0 || valor < 0) return res.status(400).json({mensagem: `Transferência negado: ${nome_resposta(cliente.nome)} não é aceito valor ${ valor == 0 ? 'zero' : 'negativo'} para transferência.`});
 
@@ -63,7 +63,7 @@ const transferencia = async (req, res) => {
 
         if (!await comparar_senha(senha, cliente.senha)) return res.status(400).json({mensagem: `Transferência negada: ${nome_resposta(cliente.nome)} a senha está incorreta.`});
 
-        await registrar_transferencia(cliente, conta_destino, await checar_banco(), valor);
+        await insert_transferencia(cliente, conta_destino, await checar_banco(), valor);
 
         return res.status(400).json({mensagem: `Tranferência efetivada: ${nome_resposta(cliente.nome)} o valor de ${valor} ${valor == 1 ? 'real' : 'reais'} foi transferido para a conta de número: ${conta_destino}.`})
     } catch (error) {

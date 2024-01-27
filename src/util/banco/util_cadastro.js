@@ -1,12 +1,13 @@
 const knex = require("../../conexoes/knex");
+const { criptar_senha } = require("../util_funcionalidades");
 
-async function cadastro_banco(nome, senha) {
+async function insert(nome, senha) {
     await knex('dados_banco').insert({
         nome: nome,
-        senha: senha
+        senha: await criptar_senha(senha)
     });
 }
 
 module.exports = {
-    cadastro_banco
+    insert
 }

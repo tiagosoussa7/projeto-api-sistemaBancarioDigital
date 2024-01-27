@@ -1,7 +1,7 @@
 const chave_banco = 'senha_tokenBanco'
-const chave_cliente = 'senha_tokenCliente'
+const chave_conta = 'senha_tokenConta'
 
 module.exports = {
     chave_banco,
-    chave_cliente
+    chave_conta
 }
