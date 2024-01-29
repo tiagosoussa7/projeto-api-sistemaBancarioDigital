@@ -1,6 +1,5 @@
 const jwt = require('jsonwebtoken');
 const knex = require('../conexoes/knex');
-const { chave_banco, chave_conta } = require('../validacoes/senhaHash');
 
 const autenticacaoBanco = async (req, res, next) => {
     try {
@@ -12,7 +11,7 @@ const autenticacaoBanco = async (req, res, next) => {
     
         if (!token) return res.status(400).json({mensagem: 'Não autorizado.'});
         
-        const { senha } = jwt.verify(token, chave_banco);
+        const { senha } = jwt.verify(token, process.env.SECRET_KEY_BANCO);
     
         const cadastro = await knex('dados_banco').where({ senha }).first();
     
@@ -36,7 +35,7 @@ const autenticacaoConta = async (req, res, next) => {
 
     if (!token) return res.status(400).json({mensagem: 'Não autorizado.'});
     
-    const { senha } = jwt.verify(token, chave_conta);
+    const { senha } = jwt.verify(token, process.env.SECRET_KEY_CONTA);
 
     const cadastro = await knex('dados_cliente').where({ senha }).first();
 
