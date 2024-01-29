@@ -1,6 +1,7 @@
 const knex = require("../../conexoes/knex");
+const { criptar_senha } = require("../util_funcionalidades");
 
-async function insert_cliente(nome, cpf, email, data_nascimento, senha_criptografada, banco) {
+async function insert_cliente(nome, cpf, email, data_nascimento, senha, banco) {
 
     knex.transaction(async (trx) => {
         const [cliente_cadastrado]  = await trx('dados_cliente').insert({
@@ -8,7 +9,7 @@ async function insert_cliente(nome, cpf, email, data_nascimento, senha_criptogra
             cpf: cpf,
             email: email,
             data_nascimento: data_nascimento,
-            senha: senha_criptografada,
+            senha: await criptar_senha(senha),
             id_banco: banco.id_banco
         }).returning('id_cliente');
         

@@ -1,6 +1,6 @@
 const { nome_resposta, data_resposta, hora_resposta } = require("../util_resposta");
 
-async function detalhar_banco(banco, res) {
+async function informacao_banco(banco, res) {
     const dados_banco = {
         Banco_cadastrada: nome_resposta(banco.nome),
         Contas_ativas: banco.qtd_contas,
@@ -13,5 +13,5 @@ async function detalhar_banco(banco, res) {
 }
 
 module.exports = {
-    detalhar_banco
+    informacao_banco
 }

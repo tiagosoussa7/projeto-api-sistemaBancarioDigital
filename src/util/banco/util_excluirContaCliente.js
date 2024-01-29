@@ -1,6 +1,6 @@
 const knex = require("../../conexoes/knex");
 
-async function del_conta(dado) {
+async function delete_conta(dado) {
     knex.transaction( async (trx) => {
         await trx('dados_cliente').where({id_cliente: dado}).del();
         await trx('dados_banco').decrement('qtd_contas', 1);
@@ -13,6 +13,6 @@ async function nome(dado) {
 }
 
 module.exports = {
-    del_conta,
+    delete_conta,
     nome
 }

@@ -1,21 +1,46 @@
-const { idade_resposta, nome_resposta, data_resposta } = require('../util/util_resposta');
-const { checar_email, checar_cpf, criptar_senha, comparar_senha, checar_saldo, checar_banco, checar_conta } = require('../util/util_funcionalidades');
-const { insert_cliente } = require('../util/conta/util_cadastro');
-const { detalhar_conta } = require('../util/conta/util_informacaoConta');
-const { detalhar_cliente } = require('../util/conta/util_informacaoCliente');
-const { del_cliente } = require('../util/conta/util_excluir');
-const { detalhar_depositos, detalhar_saques, detalhar_transferencias } = require('../util/conta/util_extrato');
-const { update_conta } = require('../util/conta/util_atualizar');
+const { 
+    idade_resposta, 
+    nome_resposta, 
+    data_resposta 
+} = require('../util/util_resposta');
 
-const cadastro = async (req,res) => {
+const { 
+    checar_email, 
+    checar_cpf, 
+    checar_saldo, 
+    checar_banco, 
+    checar_conta, 
+    comparar_senha 
+} = require('../util/util_funcionalidades');
+
+const { insert_cliente } = require('../util/conta/util_cadastro');
+
+const { detalhar_conta } = require('../util/conta/util_informacaoConta');
+
+const { detalhar_cliente } = require('../util/conta/util_informacaoCliente');
+
+const { delete_cliente } = require('../util/conta/util_excluir');
+
+const { 
+    detalhar_depositos, 
+    detalhar_saques, 
+    detalhar_transferencias 
+} = require('../util/conta/util_extrato');
+
+const { 
+    update_conta1, 
+    update_conta2, 
+    update_conta3, 
+    update_conta4, 
+    update_conta5 
+} = require('../util/conta/util_atualizar');
+
+const cadastrar = async (req,res) => {
     const { nome, cpf, email, data_nascimento, senha } = req.body;
-    const banco = await checar_banco();
-    
-    if (!nome || !cpf || !email || !data_nascimento || !senha) { 
-        return res.status(400).json({mensagem: `Cadastro negado: todos os campos são obrigatórios.`});
-    }
-    
+
     try {
+        const banco = await checar_banco();
+        
         if (!banco) return res.status(400).json({mensagem: 'Cadastro negado: sistema bancário digital está sem um banco controlador.'});
 
         if (idade_resposta(data_nascimento) < 18) return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} você tem ${idade_resposta(data_nascimento)} anos de idade e para abrir conta na instituição ${nome_resposta(banco.nome)} é necessário ter no mínimo 18 anos.`});
@@ -24,7 +49,7 @@ const cadastro = async (req,res) => {
         
         if (await checar_cpf(cpf)) return res.status(400).json({mensagem: `Cadastro negado: ${nome_resposta(nome)} o CPF: ${cpf} já está cadastrado no banco: ${nome_resposta(banco.nome)}.`});
         
-        await insert_cliente(nome, cpf, email, data_nascimento, await criptar_senha(senha), await checar_banco());
+        await insert_cliente(nome, cpf, email, data_nascimento, senha, banco);
         
         return res.status(200).json({mensagem: `Cadastro efetivado: Parabéns! ${nome_resposta(nome)}, agora você é cliente do banco: ${nome_resposta(banco.nome)}`,});
     } catch (error) {
@@ -59,25 +84,31 @@ const extrato = async (req, res) => {
 }
 
 const atualizar = async (req, res) => {
-    const { nome, email, data_nascimento, senha} = req.body;
+    const { nome, email, cpf, data_nascimento, senha} = req.body;
     const { cliente } = req;
     
-    if (!nome || !email || !data_nascimento || !senha) return res.status(400).json({mensagem: 'Atualização negada: todos os campos são obrigatórios.'});
-    
     try {
-        if (nome === cliente.nome) return res.status(400).json({mensagem: `Atualização negada: o nome ${nome_resposta(nome)} é o mesmo nome do cadastro.`});
+        if ((nome) && nome == cliente.nome) return res.status(400).json({mensagem: `Atualização negada: o nome ${nome_resposta(nome)} é o mesmo nome do seu cadastro.`});
         
-        if (email === cliente.email) return res.status(400).json({mensagem: `Atualização negada: o email ${email} é o mesmo email do cadastro.`});
+        if ((email) && email == cliente.email) return res.status(400).json({mensagem: `Atualização negada: o email ${email} é o mesmo email do seu cadastro.`});
         
-        if (email !== cliente.email) if(await checar_email(email)) return res.status(400).json({mensagem: `Atualização negada: o email ${email} já está cadastrado.`});
+        if ((email) && email !== cliente.email) if(await checar_email(email)) return res.status(400).json({mensagem: `Atualização negada: o email ${email} já está cadastrado.`});
          
-        if (data_nascimento === data_resposta(cliente.data_nascimento)) return res.status(400).json({mensagem: `Atualização negada: a data de nascimento ${data_nascimento} é a mesma do cadastro.`});
+        if ((cpf) && cpf == cliente.cpf) return res.status(400).json({mensagem: `Atualização negada: o CPF: ${cpf} é o mesmo CPF do seu cadastro.`});
+
+        if ((cpf) && cpf !== cliente.cpf) if(await checar_cpf(cpf)) return res.status(400).json({mensagem: `Atualização negada: o CPF: ${cpf} já está cadastrado.`});
+
+        if ((data_nascimento) && data_nascimento == data_resposta(cliente.data_nascimento)) return res.status(400).json({mensagem: `Atualização negada: a data de nascimento ${data_nascimento} é a mesma do seu cadastro.`});
                 
-        if(idade_resposta(data_nascimento) < 18) return res.status(400).json({mensagem: `Atualização negada: não é aceito data de nascimento menor de 18 anos.`});
+        if((data_nascimento) && idade_resposta(data_nascimento) < 18) return res.status(400).json({mensagem: `Atualização negada: não é aceito data de nascimento menor de 18 anos.`});
 
-        if(await comparar_senha(senha, cliente.senha)) return res.status(400).json({mensagem: 'Atualização negada: a senha de atualização é a mesma do cadastro.'});
+        if((senha) && await comparar_senha(senha, cliente.senha)) return res.status(400).json({mensagem: 'Atualização negada: a senha de atualização é a mesma do cadastro.'});
 
-        await update_conta(cliente, nome, email, data_nascimento, senha);
+        if(nome) await update_conta1(cliente, nome);
+        if(email) await update_conta2(cliente, email);
+        if(cpf) await update_conta3(cliente, cpf);
+        if(data_nascimento) await update_conta4(cliente, data_nascimento);
+        if(senha) await update_conta5(cliente, senha);
         
         return res.status(400).json({mensagem: 'atualização efetivada.'})
     } catch (error) {
@@ -85,35 +116,29 @@ const atualizar = async (req, res) => {
     }
 }   
     
-const excluir = async (req, res) => {
+const excluir = async (req, res) => { 
     const { cliente } = req;
     const { cpf, senha } = req.body;
 
-    if ((cpf && !senha) || (!cpf && senha) ) return res.status(400).json({mensagem: `Exclusão negada: ${nome_resposta(cliente.nome)} o campo ${ cpf ? 'senha' : 'CPF'} é obrigatório.`});
-
     try {
-        if (cpf && senha) {
-            if(cpf !== cliente.cpf) return res.status(400).json({mensagem: `Exclusão negada: ${nome_resposta(cliente.nome)} este CPF: ${cpf} não corresponde ao do seu cadastro.`});
+        if(cpf !== cliente.cpf) return res.status(400).json({mensagem: `Exclusão negada: ${nome_resposta(cliente.nome)} este CPF: ${cpf} não corresponde ao do seu cadastro.`});
 
-            if(!await comparar_senha(senha, cliente.senha )) return res.status(400).json({mensagem: `Exclusão negada: ${nome_resposta(cliente.nome)} a senha está incorreta.`});
+        if(!await comparar_senha(senha, cliente.senha )) return res.status(400).json({mensagem: `Exclusão negada: ${nome_resposta(cliente.nome)} a senha está incorreta.`});
             
-            const saldo = await checar_saldo(cliente.id_cliente);
+        const saldo = await checar_saldo(cliente.id_cliente);
 
-            if(saldo > 0) return res.status(400).json({mensagem: `Exclusão negada: ${nome_resposta(cliente.nome)} a sua conta de numero:${cliente.id_cliente} possui saldo de R$: ${saldo} ${saldo == 1 ? 'real.' : 'reais.'}`});
+        if(saldo > 0) return res.status(400).json({mensagem: `Exclusão negada: ${nome_resposta(cliente.nome)} a sua conta de numero:${cliente.id_cliente} possui saldo de R$: ${saldo} ${saldo == 1 ? 'real.' : 'reais.'}`});
 
-            await del_cliente(cliente.id_cliente);
+        await delete_cliente(cliente.id_cliente);
 
-            return res.status(200).json({mensagem: 'Exclusão efetivada.'});
-        }
-        
-        return res.status(400).json({mensagem: 'Exclusão negada: os campos CPF e senha são obrigatórios.'});
+        return res.status(200).json({mensagem: 'Exclusão efetivada.'});
     } catch (error) {
         return res.status(500).json({mensagem: `${error.message}`});
     }
 }
 
 module.exports = {
-    cadastro,
+    cadastrar,
     informacao_conta,
     informacao_cliente,
     extrato,

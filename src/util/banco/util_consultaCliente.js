@@ -40,7 +40,7 @@ async function cliente_consultado(cpf, res) {
 
 async function clientes_consultados(res) {
     
-    const clientes = await knex.select(
+    const [clientes] = await knex.select(
         'dados_cliente.nome',
         'dados_cliente.cpf',
         'dados_cliente.email',
@@ -51,7 +51,9 @@ async function clientes_consultados(res) {
     .from('dados_conta')
     .join('dados_cliente', 'dados_conta.numero_conta', 'dados_cliente.id_cliente')
     .orderBy('dados_conta.numero_conta', 'asc');
-            
+    
+    if (!clientes) return res.status(400).json({mensagem: 'Consulta negada: não ha clientes cadastrados.'});
+    
     return res.status(200).json({Dados_clientes: clientes});
 }
 

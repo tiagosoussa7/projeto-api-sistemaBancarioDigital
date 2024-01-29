@@ -1,6 +1,6 @@
 const knex = require("../../conexoes/knex");
 
-async function del_banco(dado) {
+async function delete_banco(dado) {
         await knex('dados_banco').where({ id_banco: dado }).del(); 
 }
 
@@ -17,6 +17,6 @@ async function somar_saldos(dado) {
 }
 
 module.exports = {
-    del_banco,
+    delete_banco,
     somar_saldos
 }
