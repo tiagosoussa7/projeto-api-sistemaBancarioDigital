@@ -33,7 +33,7 @@ const saque = async (req, res) => {
 
         const saldo = await checar_saldo(cliente.id_cliente);
         
-        if(saldo < valor) return res.status(400).json({mensagem: `Saque negado: ${nome_resposta(cliente.nome)} seu saldo ${saldo} ${saldo <= 1 ? 'real' : 'reais'} é insuficiente para sacar o valor de ${valor} ${valor == 1 ? 'real' : 'reais'}.`});
+        if(saldo < parseFloat(valor)) return res.status(400).json({mensagem: `Saque negado: ${nome_resposta(cliente.nome)} seu saldo ${saldo} ${saldo <= 1 ? 'real' : 'reais'} é insuficiente para sacar o valor de ${valor} ${valor == 1 ? 'real' : 'reais'}.`});
 
         await registrar_saque(cliente, await checar_banco(), valor);
         
@@ -54,7 +54,7 @@ const transferencia = async (req, res) => {
 
         const saldo = await checar_saldo(cliente.id_cliente);
         
-        if(saldo < valor) return res.status(400).json({mensagem: `Transferência negado: ${nome_resposta(cliente.nome)} seu saldo de R$:${saldo} ${saldo <= 1 ? 'real' : 'reais'} é insuficiente para tranferir o valor de R$:${valor} ${valor == 1 ? 'real' : 'reais'}.`});
+        if(saldo < parseFloat(valor)) return res.status(400).json({mensagem: `Transferência negado: ${nome_resposta(cliente.nome)} seu saldo de R$:${saldo} ${saldo <= 1 ? 'real' : 'reais'} é insuficiente para tranferir o valor de R$:${valor} ${valor == 1 ? 'real' : 'reais'}.`});
 
         if (!await comparar_senha(senha, cliente.senha)) return res.status(400).json({mensagem: `Transferência negada: ${nome_resposta(cliente.nome)} a senha está incorreta.`});
 
