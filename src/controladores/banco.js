@@ -5,7 +5,7 @@ const {
     checar_cpf, 
     checar_banco, 
     checar_conta, 
-    checar_saldo 
+    checar_saldo  
 } = require('../util/util_funcionalidades.js');
 
 const { insert_banco } = require('../util/banco/util_cadastrar.js');
