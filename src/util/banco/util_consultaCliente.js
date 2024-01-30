@@ -34,7 +34,7 @@ async function cliente_consultado(cpf, res) {
                 
         return res.status(200).json({Dados_cliente: dados_cliente})
     } else {
-        return res.status(200).json({mensagem: `Consulta negada: o CPF: ${cpf} não foi encontrada no banco de dados.`});
+        return res.status(404).json({mensagem: `Consulta negada: o CPF: ${cpf} não foi encontrada no banco de dados.`});
     }
 }
 
@@ -52,7 +52,7 @@ async function clientes_consultados(res) {
     .join('dados_cliente', 'dados_conta.numero_conta', 'dados_cliente.id_cliente')
     .orderBy('dados_conta.numero_conta', 'asc');
     
-    if (!clientes) return res.status(400).json({mensagem: 'Consulta negada: não ha clientes cadastrados.'});
+    if (!clientes) return res.status(404).json({mensagem: 'Consulta negada: não ha clientes cadastrados.'});
     
     return res.status(200).json({Dados_clientes: clientes});
 }

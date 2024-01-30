@@ -45,13 +45,13 @@ const cadastrar = async (req,res) => {
         const banco = await checar_banco();
         
         if (banco) {
-            if (banco.nome == instituicao_nome) { return res.status(400).json({mensagem: `Cadastro negado: a instituição ${nome_resposta(instituicao_nome)} já é a atual controladora do sistema bancário digital.`});
+            if (banco.nome == instituicao_nome) { return res.status(403).json({mensagem: `Cadastro negado: a instituição ${nome_resposta(instituicao_nome)} já é a atual controladora do sistema bancário digital.`});
             
-            } else return res.status(400).json({mensagem: `Cadastro negado: a instituição ${nome_resposta(banco.nome)} é a atual controladora do sistema bancário digital.`});
+            } else return res.status(403).json({mensagem: `Cadastro negado: a instituição ${nome_resposta(banco.nome)} é a atual controladora do sistema bancário digital.`});
         }
         await insert_banco(instituicao_nome, instituicao_senha);
         
-        return res.status(200).json({mensagem: `Cadastro efetivado: a instituição ${nome_resposta(instituicao_nome)} agora é controladora do sistema bancário digital.`});
+        return res.status(201).json({mensagem: `Cadastro efetivado: a instituição ${nome_resposta(instituicao_nome)} agora é controladora do sistema bancário digital.`});
     } catch (error) {
         return res.status(500).json({mensagem: `${error.message}`});
     }
@@ -81,34 +81,20 @@ const atualizar = async (req, res) => {
     const { id_banco, nome, senha } = req.banco;
     
     try {   
-            if (instituicao_nome && instituicao_senha) {
-                
-                if (instituicao_nome === nome) return res.status(400).json({mensagem: `Atualização negada: o nome ${nome_resposta(instituicao_nome) } é o mesmo do banco controlador do sistema.`});
-                
-                if (await comparar_senha(instituicao_senha, senha)) return res.status(401).json({mensagem: `Atualização negada: a senha da atualização é a mesma do banco cadastrado no sistema.`});
-                
-                await update_banco1(instituicao_nome, instituicao_senha, id_banco);
-                
-                return res.status(200).json({mensagem: `Atualização efetivada: o nome e a senha da instituição foram modificados.`});
-            }
-                                           
-            if (instituicao_nome) {
-                if (instituicao_nome === nome) return res.status(400).json({mensagem: `Atualização negada: o nome ${nome_resposta(instituicao_nome) } é o mesmo do banco controlador do sistema.`});
-                await update_banco2(instituicao_nome, id_banco);
-                return res.status(200).json({mensagem: `Atualização efetivada: o banco: ${nome_resposta(req.banco.nome)} agora se chama ${nome_resposta(instituicao_nome)}.`});
-            }
-                
-            if (instituicao_senha) { 
-                if (await comparar_senha(instituicao_senha, senha)) return res.status(401).json({mensagem: `Atualização negada: a senha da atualização é a mesma do banco cadastrado no sistema.`});
-                await update_banco3(instituicao_senha, id_banco);
-                return res.status(200).json({mensagem: `Atualização efetivada: a senha da instituição foi modificada.`});
-            }
+        if ((instituicao_nome) && instituicao_nome == nome) return res.status(403).json({mensagem: `Atualização negada: o nome ${nome_resposta(instituicao_nome) } é o mesmo do banco controlador do sistema.`});
+        if ((instituicao_senha) && await comparar_senha(instituicao_senha, senha)) return res.status(403).json({mensagem: `Atualização negada: a senha da atualização é a mesma do banco cadastrado no sistema.`});
+            
+        if (instituicao_nome) await update_banco2(instituicao_nome, id_banco);
+        if (instituicao_senha) await update_banco3(instituicao_senha, id_banco);
+        
+        if (instituicao_nome && instituicao_senha) return res.status(200).json({mensagem: `Atualização efetivada: o nome e a senha da instituição foram modificados`});
+        if (instituicao_nome || instituicao_senha) return res.status(200).json({mensagem: `Atualização efetivada: ${instituicao_nome ? 'O nome da intistuição foi modificado.' : 'A senha da instituição foi modificada.'}`});
         
         return res.status(400).json({mensagem: 'Atualização negada: para modificação de dados é necessário preencher ao menos um campo'});
     } catch (error) {
         return res.status(500).json(`${error.message}`)
     }
-}
+}       
 
 const excluir_contaCliente = async (req, res) => {
     const { numero_conta, cpf } = req.body;
@@ -117,9 +103,9 @@ const excluir_contaCliente = async (req, res) => {
         if (numero_conta) {
             const conta = await checar_conta(numero_conta);
 
-            if (!conta) return res.status(400).json({mensagem: `Exclusão negada: O numero de conta: ${numero_conta} não foi encontrado.`});
+            if (!conta) return res.status(403).json({mensagem: `Exclusão negada: O numero de conta: ${numero_conta} não foi encontrado.`});
             
-            if (conta.saldo > 0) return res.status(400).json({mensagem: `Exclusão negada: conta de numero: ${numero_conta} possui saldo de ${conta.saldo}, solicitar ao cliente ${nome_resposta(await nome(numero_conta))} retirada total do saldo.`});
+            if (conta.saldo > 0) return res.status(403).json({mensagem: `Exclusão negada: conta de numero: ${numero_conta} possui saldo de ${conta.saldo}, solicitar ao cliente ${nome_resposta(await nome(numero_conta))} retirada total do saldo.`});
             
             await delete_conta(numero_conta);
 
@@ -129,18 +115,18 @@ const excluir_contaCliente = async (req, res) => {
         if (cpf) {
             const conta = await checar_cpf(cpf);
             
-            if (!conta) return res.status(400).json({mensagem: `Exclusão negada: O CPF: ${cpf} não foi encontrado.`});
+            if (!conta) return res.status(403).json({mensagem: `Exclusão negada: O CPF: ${cpf} não foi encontrado.`});
             
             const saldo = await checar_saldo(conta.id_cliente);
             
-            if (saldo > 0) return res.status(400).json({mensagem: `Exclusão negada: conta de numero: ${conta.id_cliente} possui saldo de ${saldo}, solicitar ao cliente: ${nome_resposta(conta.nome)} retirada total do saldo.`});
+            if (saldo > 0) return res.status(403).json({mensagem: `Exclusão negada: conta de numero: ${conta.id_cliente} possui saldo de ${saldo}, solicitar ao cliente: ${nome_resposta(conta.nome)} retirada total do saldo.`});
             
             await delete_conta(conta.id_cliente);
             
             return res.status(200).json({mensagem: `Exclusão efetivada: a conta de número: ${conta.id_cliente}, cliente ${conta.nome} e com CPF: ${cpf} vinculado foi excluída.`});
         }
             
-        return res.status(200).json({mensagem: 'Exclusão negada: preencha número da conta ou cpf do cliente.'});
+        return res.status(400).json({mensagem: 'Exclusão negada: preencha número da conta ou cpf do cliente.'});
     } catch (error) {
         return res.status(500).json(`${error.message}`)
     }
@@ -151,15 +137,15 @@ const excluir = async (req, res) => {
     const { id_banco, senha, nome } = req.banco;
          
     try {
-        if (instituicao_nome !== nome) return res.status(400).json({mensagem: `Exclusão negada: o banco ${nome_resposta(instituicao_nome)} não é o controlador atual do sistema.`}); 
+        if (instituicao_nome !== nome) return res.status(403).json({mensagem: `Exclusão negada: o banco ${nome_resposta(instituicao_nome)} não é o controlador atual do sistema.`}); 
             
-        if (!await comparar_senha(instituicao_senha, senha)) return res.status(400).json({mensagem: 'Exclusão negada: senha inválida.'});
+        if (!await comparar_senha(instituicao_senha, senha)) return res.status(403).json({mensagem: 'Exclusão negada: senha inválida.'});
 
-        if (await somar_saldos(id_banco) > 0) return res.status(400).json({mensagem: `Exclusão negada: o banco ${nome_resposta(instituicao_nome)} possui contas com saldo.`})
+        if (await somar_saldos(id_banco) > 0) return res.status(403).json({mensagem: `Exclusão negada: o banco ${nome_resposta(instituicao_nome)} possui contas com saldo.`})
             
         await delete_banco(id_banco);
             
-        return res.json({mensagem: `Exclusão efetivada: o banco ${nome_resposta(instituicao_nome)} não é mais o controlador do sistema.`});
+        return res.status(200).json({mensagem: `Exclusão efetivada: o banco ${nome_resposta(instituicao_nome)} não é mais o controlador do sistema.`});
     } catch (error) {
         return res.status(500).json(`${error.message}`)
     }

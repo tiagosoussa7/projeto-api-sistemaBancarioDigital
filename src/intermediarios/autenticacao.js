@@ -9,13 +9,13 @@ const autenticacaoBanco = async (req, res, next) => {
         
         const token = authorization.split(' ')[1];
     
-        if (!token) return res.status(400).json({mensagem: 'Não autorizado.'});
+        if (!token) return res.status(401).json({mensagem: 'Não autorizado.'});
         
         const { senha } = jwt.verify(token, process.env.SECRET_KEY_BANCO);
     
         const cadastro = await knex('dados_banco').where({ senha }).first();
     
-        if (!cadastro) return res.status(401).json({mensagem: 'Não autorizado: sistema bancário digital offline.'});
+        if (!cadastro) return res.status(404).json({mensagem: 'Não autorizado: sistema bancário digital offline.'});
     
         req.banco = cadastro;
     
@@ -33,7 +33,7 @@ const autenticacaoConta = async (req, res, next) => {
     
     const token = authorization.split(' ')[1];
 
-    if (!token) return res.status(400).json({mensagem: 'Não autorizado.'});
+    if (!token) return res.status(401).json({mensagem: 'Não autorizado.'});
     
     const { senha } = jwt.verify(token, process.env.SECRET_KEY_CONTA);
 

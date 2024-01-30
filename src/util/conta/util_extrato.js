@@ -2,17 +2,21 @@ const knex = require("../../conexoes/knex");
 const { data_resposta, hora_resposta } = require("../util_resposta");
 
 async function detalhar_depositos(tabela, cliente, res) {
-    return res.status(200).json({Extrato_depositos: await extrato_geral(tabela, cliente)});
+    return res.status(200).json({EXTRATO_DEPOSITOS: await extrato_geral(tabela, cliente)});
 }
 
 async function detalhar_saques(tabela, cliente, res) {
-    return res.status(200).json({Extrato_saques: await extrato_geral(tabela, cliente)});
+    return res.status(200).json({EXTRATO_SAQUES: await extrato_geral(tabela, cliente)});
 }
 
-async function detalhar_transferencias(cliente, res) {
+async function detalhar_transferencias(tabela1, tabela2, cliente, res) {
+    return res.status(200).json({EXTRATO_TRANSFERÊNCIAS: await transferencias_geral(tabela1, tabela2, cliente)})
+}
+
+async function transferencias_geral(tabela1, tabela2, cliente) {
     
-    const enviados = await knex('transferencias_enviadas').where({conta_origem: cliente.id_cliente}).select('*');
-    const recebidos = await knex('transferencias_recebidas').where({conta_destino: cliente.id_cliente}).select('*');
+    const enviados = await knex(tabela1).where({conta_origem: cliente.id_cliente}).select('*');
+    const recebidos = await knex(tabela2).where({conta_destino: cliente.id_cliente}).select('*');
             
             const dadosEnviados = enviados.map((enviado) => ({
                 Conta_destino: enviado.conta_destino,
@@ -28,10 +32,10 @@ async function detalhar_transferencias(cliente, res) {
                 Horário: hora_resposta(recebido.hora)
             }));
    
-    return res.status(200).json({
-        Transferências_enviadas: dadosEnviados,
-        Transferências_recebidas: dadosRecebidos,
-    });
+    return {
+        ENVIADAS: dadosEnviados,
+        RECEBIDAS: dadosRecebidos,
+    };
 }
 
 async function extrato_geral(tabela, cliente) {
@@ -48,9 +52,23 @@ async function extrato_geral(tabela, cliente) {
     return dadosFormatados;        
 }
 
+async function extrato_completo(tabela1, tabela2, tabela3, tabela4, cliente, res) {
+    
+    const depositos = await extrato_geral(tabela1, cliente);
+    const saques = await extrato_geral(tabela2, cliente);
+    const transferencias = await transferencias_geral(tabela3, tabela4, cliente);
+
+    return res.status(200).json({
+        EXTRATO_DEPOSITOS: depositos,
+        EXTRATO_SAQUES: saques,
+        EXTRATO_TRANSFERÊNCIAS: transferencias
+    })
+}
+
 
 module.exports = {
     detalhar_depositos,
     detalhar_saques,
-    detalhar_transferencias
+    detalhar_transferencias,
+    extrato_completo
 }

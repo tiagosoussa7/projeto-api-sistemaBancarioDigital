@@ -33,7 +33,7 @@ async function conta_consultada(numero_conta, res) {
                 
         return res.status(200).json({Dados_conta: dados_conta})
     
-    } else return res.status(400).json({mensagem: `Consulta negada: a conta de número: ${numero_conta} não foi encontrada no banco de dados.`});
+    } else return res.status(404).json({mensagem: `Consulta negada: a conta de número: ${numero_conta} não foi encontrada no banco de dados.`});
 }
 
 async function contas_consultadas(res) {
@@ -50,7 +50,7 @@ async function contas_consultadas(res) {
     .join('dados_cliente', 'dados_conta.numero_conta', 'dados_cliente.id_cliente')
     .orderBy('dados_conta.numero_conta', 'asc');
     
-    if (!contas) return res.status(400).json({mensagem: 'Consulta negada: não há contas no banco.'});
+    if (!contas) return res.status(404).json({mensagem: 'Consulta negada: não há contas no banco.'});
     
     return res.status(200).json({Dados_contas: contas});
 }
