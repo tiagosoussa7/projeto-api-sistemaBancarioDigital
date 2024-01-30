@@ -236,6 +236,8 @@ _Caso haja **sucesso** na requisição, no corpo (body) da resposta haverá, em 
 <br>
 </details>
 
+#### **_ATENÇÃO: todas as funcionalidades (endpoints) da conta a seguir, exigirão o token de autenticação da conta bancária logada no sistema. Portanto será necessário validar o token informado_**
+
 <details>
 <summary><b>Informações conta</b></summary>
 <br>
@@ -262,6 +264,8 @@ _Caso haja **sucesso** na requisição, no corpo (body) da resposta haverá, em 
 </details>
 
 ## _Endpoints - Transações:_
+
+#### **_ATENÇÃO: todas as funcionalidades (endpoints) de transações a seguir, exigirão o token de autenticação da conta bancária logada no sistema. Portanto será necessário validar o token informado_**
 
 <details>
 <summary><b>Deposito</b></summary>
