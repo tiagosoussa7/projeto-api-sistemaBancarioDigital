@@ -276,6 +276,12 @@ _Sem parametros de rota ou query. O corpo (body) possuirá requisição obrigat�
 
 _Caso haja **sucesso** na requisição, no corpo (body) da resposta haverá um objeto com mensagem adequada a solicitação._
 
+#
+
+###### `Imagem:`
+
+![Imagem:exclusão](./assets/exclusaoBanco.jpeg)
+
 </details>
 
 ## _Endpoints - Conta:_
