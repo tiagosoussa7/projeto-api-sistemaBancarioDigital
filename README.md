@@ -32,7 +32,25 @@ _Já em relação a abertura de conta, ao ser realizado o primeiro cadastro de c
 - _Efetuar saque._
 - _Efetuar transferências._
 
-## _Rodando o projeto_
+#
+
+#### `Rodando o projeto:`
+
+```
+# 1° Clone o projeto
+
+git clone git@github.com:tiagosoussa7/projeto-api-sistemaBancarioDigital.git
+
+# 2° Instale as depedências
+
+npm init -y
+npm i -D nodemon
+npm i express pg knex bcrypt jsonwebtoken joi dotenv
+
+# 3° Execute o back-end
+
+npm run dev
+```
 
 ## _Endpoints - Banco:_
 
@@ -536,7 +554,7 @@ _Sem parametros de rota ou query. O corpo (body) possuirá requisição obrigat�
 - - _Valida se os campos **conta_destino**,**valor** e **senha** foram passados corretamente._
 - - _Valida se a **conta_destino** é diferente da conta origem da transferência._
 - - _Valida se a **senha** fornecida é a mesma do cadastro da conta._
-- - _Verifica se a conta possui saldo suficiente para efetuar a transferência._
+- - _Verifica se o cliente tem saldo suficiente para efetuar a transferência._
 
 #### _Resposta:_
 
