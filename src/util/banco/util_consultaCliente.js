@@ -40,7 +40,7 @@ async function cliente_consultado(cpf, res) {
 
 async function clientes_consultados(res) {
     
-    const [clientes] = await knex.select(
+    const clientes = await knex.select(
         'dados_cliente.nome',
         'dados_cliente.cpf',
         'dados_cliente.email',
