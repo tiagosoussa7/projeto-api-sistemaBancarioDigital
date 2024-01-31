@@ -80,7 +80,9 @@ _Sem parametros de rota ou query. O corpo (body) deverá possuir um objeto com a
 
 _Caso haja **sucesso** na requisição de cadastro, o corpo (body) da resposta haverá um objeto com uma propriedade mensagem e resposta adequada a solicitação._
 
-// imagem
+###### `Imagem:`
+
+![cadastro:banco](./assets/cadastroBanco.jpeg)
 
 </details>
 
@@ -109,7 +111,11 @@ _Sem parametros de rota ou query. O corpo (body) deverá possuir um objeto com a
 
 _Caso haja **sucesso** na requisição de login, o corpo (body) da resposta haverá um objeto com a propriedade token, que deverá possuir como valor o token de autenticação gerado._
 
-// imagem
+###### `Imagem:`
+
+![Imagem:loginBanco](./assets/loginBanco.jpeg)
+
+#
 
 </details>
 
@@ -139,7 +145,11 @@ _Sem parametros de rota ou query.O corpo (body) da requisição não deverá pos
 
 _Caso haja **sucesso** na requisição, o corpo (body) da resposta haverá um objeto com as informações detalhadas do banco._
 
-// imagem
+###### `Imagem:`
+
+![Imagem:informacaoBanco](./assets/informacaoBanco.jpeg)
+
+#
 
 </details>
 
@@ -167,7 +177,11 @@ _Sem parametros de rota. O corpo (body) não possuirá requisição em caso de c
 
 _Caso haja **sucesso** na requisição, no corpo (body) da resposta haverá, em caso de consulta geral, um objeto com a listagem de todas as contas no banco ou, em caso de consulta indivídual, um objeto com as informações da conta consultada._
 
-// imagem
+###### `Imagem:`
+
+![Imagem:consultaConta](./assets/consultaContaBanco.jpeg)
+
+#
 
 </details>
 
@@ -195,7 +209,11 @@ _Sem parametros de rota ou query. O corpo (body) não possuirá requisição em 
 
 _Caso haja **sucesso** na requisição, no corpo (body) da resposta haverá, em caso de consulta geral, um objeto com a listagem de todas os dados dos clientes do banco ou, em caso de consulta indivídual, um objeto com as informações dos dados do cliente consultado._
 
-//imagem
+###### `Imagem:`
+
+![Imagem:consultaDados](./assets/consultaDadosClienteBanco.jpeg)
+
+#
 
 </details>
 
@@ -223,6 +241,12 @@ _Sem parametros de rota ou query. O corpo (body) possuirá requisição dinâmic
 
 _Caso haja **sucesso** na requisição, no corpo (body) da resposta haverá um objeto com mensagem adequada a solicitação._
 
+###### `Imagem:`
+
+![Imagem:atualizacaoBanco](./assets/atualizacaoBanco.jpeg)
+
+#
+
 </details>
 
 <details>
@@ -248,6 +272,12 @@ _Sem parametros de rota ou query. O corpo (body) possuirá requisição dinâmic
 #### _Resposta:_
 
 _Caso haja **sucesso** na requisição, no corpo (body) da resposta haverá um objeto com mensagem adequada a solicitação._
+
+###### `Imagem:`
+
+![Imagem:exclusãoConta](./assets/exclusaoContaBanco.jpeg)
+
+#
 
 </details>
 
@@ -282,6 +312,8 @@ _Caso haja **sucesso** na requisição, no corpo (body) da resposta haverá um o
 
 ![Imagem:exclusão](./assets/exclusaoBanco.jpeg)
 
+#
+
 </details>
 
 ## _Endpoints - Conta:_
@@ -315,7 +347,11 @@ _Sem parametros de rota ou query. O corpo (body) deverá possuir um objeto com a
 
 _Caso haja **sucesso** na requisição de cadastro, o corpo (body) da resposta haverá um objeto com uma propriedade mensagem e resposta adequada a solicitação._
 
-// imagem
+###### `Imagem:`
+
+![Imagem:cadastroConta](./assets/cadastroConta.jpeg)
+
+#
 
 </details>
 
@@ -345,7 +381,11 @@ _Sem parametros de rota ou query. O corpo (body) deverá possuir um objeto com a
 
 _Caso haja **sucesso** na requisição de login, o corpo (body) da resposta haverá um objeto com a propriedade token, que deverá possuir como valor o token de autenticação gerado._
 
-// imagem
+###### `Imagem:`
+
+![Imagem:loginConta](./assets/loginConta.jpeg)
+
+#
 
 </details>
 
@@ -371,7 +411,11 @@ _Sem parametros de rota ou query.O corpo (body) da requisição não deverá pos
 
 _Caso haja **sucesso** na requisição, o corpo (body) da resposta haverá um objeto com as informações detalhadas da conta._
 
-// imagem
+###### `Imagem:`
+
+![Imagem:informacaoConta](./assets/informacaoConta.jpeg)
+
+#
 
 </details>
 
@@ -395,7 +439,11 @@ _Sem parametros de rota ou query.O corpo (body) da requisição não deverá pos
 
 _Caso haja **sucesso** na requisição, o corpo (body) da resposta haverá um objeto com as informações detalhadas do cliente._
 
-// imagem
+###### `Imagem:`
+
+![Imagem:informacaoCliente](./assets/informacaoCliente.jpeg)
+
+#
 
 </details>
 
@@ -422,7 +470,11 @@ _Sem parametros de rota ou query. O corpo (body) deverá possuir um objeto com a
 
 _Caso haja **sucesso** na requisição, o corpo (body) da resposta haverá um objeto com as informações detalhadas de qual tipo de extrato foi solicitado pelo cliente._
 
-// imagem
+###### `Imagem:`
+
+![Imagem:extrato](./assets/extrato.jpeg)
+
+#
 
 </details>
 
@@ -455,6 +507,12 @@ _Sem parametros de rota ou query. O corpo (body) possuirá requisição dinâmic
 
 _Caso haja **sucesso** na requisição, no corpo (body) da resposta haverá um objeto com mensagem adequada a solicitação._
 
+###### `Imagem:`
+
+![Imagem:atualizacaoConta](./assets/atualizacao.jpeg)
+
+#
+
 </details>
 
 <details>
@@ -467,7 +525,7 @@ _Essa rota permite ao cliente excluir seus dados cadastrais e a conta bancária.
 
 #### _Requisição:_
 
-_Sem parametros de rota ou query. O corpo (body) possuirá requisição obrigatório, com um objeto com as seguintes propriedades respeitando estes nome(s))._
+_Sem parametros de rota ou query. O corpo (body) possuirá requisição obrigatório, com um objeto com as seguintes propriedades (respeitando estes nome(s))._
 
 - _cpf_
 - _senha_
@@ -481,6 +539,12 @@ _Sem parametros de rota ou query. O corpo (body) possuirá requisição obrigat�
 #### _Resposta:_
 
 _Caso haja **sucesso** na requisição, no corpo (body) da resposta haverá um objeto com mensagem adequada a solicitação._
+
+###### `Imagem:`
+
+![Imagem:excluirConta](./assets/excluirConta.jpeg)
+
+#
 
 </details>
 
@@ -510,6 +574,12 @@ _Sem parametros de rota ou query. O corpo (body) possuirá requisição obrigat�
 
 _Caso haja **sucesso** na requisição, no corpo (body) da resposta haverá um objeto com mensagem adequada a solicitação._
 
+###### `Imagem:`
+
+![Imagem:deposito](./assets/deposito.jpeg)
+
+#
+
 </details>
 
 <details>
@@ -536,6 +606,12 @@ _Sem parametros de rota ou query. O corpo (body) possuirá requisição obrigat�
 #### _Resposta:_
 
 _Caso haja **sucesso** na requisição, no corpo (body) da resposta haverá um objeto com mensagem adequada a solicitação._
+
+###### `Imagem:`
+
+![Imagem:saque](./assets/saque.jpeg)
+
+#
 
 </details>
 
@@ -565,6 +641,12 @@ _Sem parametros de rota ou query. O corpo (body) possuirá requisição obrigat�
 #### _Resposta:_
 
 _Caso haja **sucesso** na requisição, no corpo (body) da resposta haverá um objeto com mensagem adequada a solicitação._
+
+###### `Imagem:`
+
+![Imagem:transferencia](./assets/transferencia.jpeg)
+
+#
 
 </details>
 
