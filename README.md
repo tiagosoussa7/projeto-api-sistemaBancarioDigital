@@ -227,7 +227,7 @@ _Essa rota permite ao banco modificar seus dados cadastrais._
 
 #### _Requisição:_
 
-_Sem parametros de rota ou query. O corpo (body) possuirá requisição dinâmica, podendo o banco modificar o nome e/ou senha.Para isso é necessário passar um objeto com a(s) seguinte(s) propriedade(s) (respeitando este(s) nome(s))._
+_Sem parametros de rota ou query. O corpo (body) possuirá requisição dinâmica, podendo o banco modificar o nome e/ou senha. Para isso é necessário passar um objeto com a(s) seguinte(s) propriedade(s) (respeitando este(s) nome(s))._
 
 - _instituicao_nome_
 - _instituicao_senha_
@@ -255,7 +255,7 @@ _Caso haja **sucesso** na requisição, no corpo (body) da resposta haverá um o
 
 #### `DELETE/banco/conta`
 
-_Essa rota permite ao banco excluir qualquer conta bancária dos seus cliente._
+_Essa rota permite ao banco excluir qualquer conta bancária._
 
 #### _Requisição:_
 
@@ -299,8 +299,8 @@ _Sem parametros de rota ou query. O corpo (body) possuirá requisição obrigat�
 #### _Requisitos obrigatórios:_
 
 - - _Validar se os campos instituicao_nome e instituicao_senha foram passados corretamente._
-- - _Validar se os campos instituicao\_ nome e senha são os mesmo do banco de dados do sistema._
-- - _Validar se existem alguma conta bancária com saldo positivo._
+- - _Validar se os campos instituicao_nome e senha são os mesmo do banco de dados do sistema._
+- - _Validar se existe alguma conta bancária com saldo positivo._
 
 #### _Resposta:_
 
@@ -338,7 +338,7 @@ _Sem parametros de rota ou query. O corpo (body) deverá possuir um objeto com a
 
 #### _Requisitos obrigatórios:_
 
-- _Valida se os campos **nome**, **cpf**,**email**, **data_nascimento** e **senha** foram passados corretamente._
+- _Valida se os campos **nome**, **cpf**, **email**, **data_nascimento** e **senha** foram passados corretamente._
 - _Valida se o **cpf** e **email** já estão cadastrados no banco._
 - _Valida se o cliente que deseja abrir a conta tem 18 anos ou mais._
 - _Criptografa a senha antes de pesistir no banco de dados._
@@ -374,7 +374,7 @@ _Sem parametros de rota ou query. O corpo (body) deverá possuir um objeto com a
 #### _Requisitos obrigatórios:_
 
 - _Valida se os campos **email** ou **cpf** e **senha** foram passados corretamente._
-- _Verifica se o **email** ou **cpf** e **senha** conferem com a do cadastro do cliente._
+- _Verifica se o **email** ou **cpf** e **senha** conferem com o do cadastro do cliente._
 - _Cria um token de autenticação para a conta._
 
 #### _Resposta:_
@@ -463,7 +463,7 @@ _Sem parametros de rota ou query. O corpo (body) deverá possuir um objeto com a
 
 #### _Requisitos obrigatórios:_
 
-- _Valida se o campo **transacao** foi passado corretamente._
+- _Valida se o campo **extrato** foi passado corretamente._
 - _Verifica se o cliente especificou qual o tipo de **extrato** deseja consultar, se: **depositos**, **saques**, **transferencias** ou **completo**._
 
 #### _Resposta:_
@@ -488,7 +488,7 @@ _Essa rota permite ao cliente modificar seus dados cadastrais._
 
 #### _Requisição:_
 
-_Sem parametros de rota ou query. O corpo (body) possuirá requisição dinâmica, podendo o cliente modificar o **nome**, **cpf**, **email**,**data_nascimento** ou **senha**.Para isso é necessário passar um objeto com a(s) seguinte(s) propriedade(s) (respeitando este(s) nome(s))._
+_Sem parametros de rota ou query. O corpo (body) possuirá requisição dinâmica, podendo o cliente modificar o **nome**, **cpf**, **email**, **data_nascimento** ou **senha**. Para isso é necessário passar um objeto com a(s) seguinte(s) propriedade(s) (respeitando este(s) nome(s))._
 
 - _nome_
 - _cpf_
@@ -502,6 +502,7 @@ _Sem parametros de rota ou query. O corpo (body) possuirá requisição dinâmic
 - - _Valida se o(s) campo(s) **cpf** e/ou **email** são os mesmo da conta bancária ou se já estão cadastros em outras contas._
 - - _Valida se a atualização de data de nascimento é igual ou maior que 18 anos._
 - - _Valida se a senha para atualização é a mesma que a cadastrada na conta._
+- - _Criptografa a nova senha de atualização no banco de dados._
 
 #### _Resposta:_
 
@@ -525,7 +526,7 @@ _Essa rota permite ao cliente excluir seus dados cadastrais e a conta bancária.
 
 #### _Requisição:_
 
-_Sem parametros de rota ou query. O corpo (body) possuirá requisição obrigatório, com um objeto com as seguintes propriedades (respeitando estes nome(s))._
+_Sem parametros de rota ou query. O corpo (body) possuirá requisição obrigatório, com um objeto com as seguintes propriedades (respeitando estes nomes)._
 
 - _cpf_
 - _senha_
@@ -637,6 +638,7 @@ _Sem parametros de rota ou query. O corpo (body) possuirá requisição obrigat�
 - - _Valida se a **conta_destino** é diferente da conta origem da transferência._
 - - _Valida se a **senha** fornecida é a mesma do cadastro da conta._
 - - _Verifica se o cliente tem saldo suficiente para efetuar a transferência._
+- - _Verifica se a **conta_destino** existe._
 
 #### _Resposta:_
 
